@@ -1,15 +1,18 @@
+import copy
+
+import numpy as np
+import torch
+import torch.nn as nn
+
+import lambdaLearn.Config.MeanTeacherReg as config
 from lambdaLearn.Base.DeepModelMixin import DeepModelMixin
 from lambdaLearn.Base.InductiveEstimator import InductiveEstimator
 from lambdaLearn.Loss.MSE import MSE
 from lambdaLearn.Loss.Semi_Supervised_Loss import Semi_Supervised_Loss
-from lambdaLearn.sklearn.base import RegressorMixin
-import numpy as np
-from lambdaLearn.utils import Bn_Controller
 from lambdaLearn.Network.MLPReg import MLPReg
-import torch.nn as nn
-import copy
-import torch
-import lambdaLearn.Config.MeanTeacherReg as config
+from lambdaLearn.sklearn.base import RegressorMixin
+from lambdaLearn.utils import Bn_Controller
+
 
 class MeanTeacherReg(DeepModelMixin,InductiveEstimator,RegressorMixin):
     def __init__(self,
@@ -151,6 +154,3 @@ class MeanTeacherReg(DeepModelMixin,InductiveEstimator,RegressorMixin):
 
     def predict(self,X=None,valid=None):
         return DeepModelMixin.predict(self,X=X,valid=valid)
-
-
-

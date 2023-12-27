@@ -1,5 +1,7 @@
-from lambdaLearn.Base.Transformer import Transformer
 import torch_geometric.transforms as gt
+
+from lambdaLearn.Base.Transformer import Transformer
+
 
 class NormalizeFeatures(Transformer):
     def __init__(self,attrs=["x"]):

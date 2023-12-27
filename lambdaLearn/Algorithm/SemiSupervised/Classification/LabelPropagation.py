@@ -1,9 +1,11 @@
-from lambdaLearn.Base.TransductiveEstimator import TransductiveEstimator
-from sklearn.base import ClassifierMixin
 import numpy as np
 import sklearn.semi_supervised._label_propagation as sklp
+from sklearn.base import ClassifierMixin
 from torch.utils.data.dataset import Dataset
+
 import lambdaLearn.Config.LabelPropagation as config
+from lambdaLearn.Base.TransductiveEstimator import TransductiveEstimator
+
 
 class LabelPropagation(TransductiveEstimator,ClassifierMixin):
     def __init__(

@@ -1,7 +1,10 @@
 from torch.utils.data import Dataset
-from .LabeledDataset import LabeledDataset
+
 from lambdaLearn.Dataset.UnlabeledDataset import UnlabeledDataset
+
 from ..Split.DataSplit import DataSplit
+from .LabeledDataset import LabeledDataset
+
 
 class TrainDataset(Dataset):
     def __init__(self,

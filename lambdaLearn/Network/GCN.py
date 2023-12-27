@@ -1,6 +1,8 @@
 import torch
-from torch_geometric.nn import  GCNConv
 import torch.nn.functional as F
+from torch_geometric.nn import GCNConv
+
+
 class GCN(torch.nn.Module):
     def __init__(self,dim_in,num_classes,dim_hidden=16,normalize=False):
         # >> Parameter

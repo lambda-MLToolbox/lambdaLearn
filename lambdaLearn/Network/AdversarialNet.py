@@ -1,6 +1,8 @@
+import numpy as np
 import torch
 import torch.nn as nn
-import numpy as np
+
+
 class GradientReverseLayer(torch.autograd.Function):
     """
     usage:(can't be used in nn.Sequential, not a subclass of nn.Module)::

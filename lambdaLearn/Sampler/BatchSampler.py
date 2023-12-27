@@ -1,5 +1,8 @@
-from lambdaLearn.Base.BaseSampler import BaseSampler
 import torch.utils.data.sampler as torchsampler
+
+from lambdaLearn.Base.BaseSampler import BaseSampler
+
+
 class BatchSampler(BaseSampler):
     def __init__(self, batch_size: int, drop_last: bool):
         super().__init__()

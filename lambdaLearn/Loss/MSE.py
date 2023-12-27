@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class MSE(nn.Module):
     def __init__(self,reduction='mean',activation_1=None,activation_2=None):
         super().__init__()

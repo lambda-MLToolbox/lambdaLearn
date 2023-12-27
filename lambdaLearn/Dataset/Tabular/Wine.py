@@ -1,11 +1,13 @@
-from lambdaLearn.Dataset.SemiDataset import SemiDataset
-from lambdaLearn.Base.TabularMixin import TabularMixin
-from lambdaLearn.Split.DataSplit import DataSplit
-from lambdaLearn.Dataset.TrainDataset import TrainDataset
-from lambdaLearn.Dataset.LabeledDataset import LabeledDataset
-from lambdaLearn.Dataset.UnlabeledDataset import UnlabeledDataset
-from sklearn import datasets
 import numpy as np
+from sklearn import datasets
+
+from lambdaLearn.Base.TabularMixin import TabularMixin
+from lambdaLearn.Dataset.LabeledDataset import LabeledDataset
+from lambdaLearn.Dataset.SemiDataset import SemiDataset
+from lambdaLearn.Dataset.TrainDataset import TrainDataset
+from lambdaLearn.Dataset.UnlabeledDataset import UnlabeledDataset
+from lambdaLearn.Split.DataSplit import DataSplit
+
 
 class Wine(SemiDataset,TabularMixin):
     def __init__(

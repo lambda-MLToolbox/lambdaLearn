@@ -2,6 +2,7 @@ import copy
 
 import numpy as np
 
+
 def ViewSplit(X,num_splits=2,axis=1,shuffle=True):
     # >> Parameter
     # >> - X: Samples of the data to be split.

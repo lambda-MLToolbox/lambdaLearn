@@ -1,17 +1,17 @@
 import copy
 from math import ceil
+
 import torch
-from lambdaLearn.Base.SemiEstimator import SemiEstimator
+from torch.nn import Softmax
 from torch.utils.data.dataset import Dataset
-from lambdaLearn.Dataset.TrainDataset import TrainDataset
 
 from lambdaLearn.Base.BaseOptimizer import BaseOptimizer
 from lambdaLearn.Base.BaseScheduler import BaseScheduler
-
-from lambdaLearn.utils import EMA
-from lambdaLearn.utils import to_device
-from torch.nn import Softmax
+from lambdaLearn.Base.SemiEstimator import SemiEstimator
 from lambdaLearn.Dataloader.TrainDataloader import TrainDataLoader
+from lambdaLearn.Dataset.TrainDataset import TrainDataset
+from lambdaLearn.utils import EMA, to_device
+
 
 class DeepModelMixin(SemiEstimator):
     def __init__(self, train_dataset=None,

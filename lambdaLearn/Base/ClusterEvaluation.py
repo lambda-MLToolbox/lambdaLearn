@@ -1,4 +1,6 @@
-from abc import ABC,abstractmethod
+from abc import ABC, abstractmethod
+
+
 class ClusterEvaluation(ABC):
     def __init__(self):
         pass

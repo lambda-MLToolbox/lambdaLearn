@@ -1,6 +1,8 @@
-from lambdaLearn.Base.Transformer import Transformer
 import random
+
+from lambdaLearn.Base.Transformer import Transformer
 from lambdaLearn.Transform.Text.Tokenizer import Tokenizer
+
 
 class RandomSwap(Transformer):
     def __init__(self,n=1,tokenizer=None):

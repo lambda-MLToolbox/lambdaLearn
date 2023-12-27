@@ -1,8 +1,10 @@
+import numpy as np
 import PIL.Image
 import torch
-import numpy as np
-from lambdaLearn.Base.Transformer import Transformer
 import torchvision.transforms.functional as F
+
+from lambdaLearn.Base.Transformer import Transformer
+
 
 class Solarize(Transformer):
     def __init__(self, min_v=0,max_v=255,num_bins=10,magnitude=5,v=None,scale=256):

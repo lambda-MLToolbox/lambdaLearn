@@ -1,6 +1,8 @@
-from sklearn.pipeline import Pipeline
 from sklearn import preprocessing
+from sklearn.pipeline import Pipeline
+
 from lambdaLearn.Transform.ToTensor import ToTensor
+
 
 class TabularMixin:
     def __init__(self):

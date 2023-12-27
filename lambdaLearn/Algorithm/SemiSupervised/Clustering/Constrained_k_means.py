@@ -1,9 +1,12 @@
+import random
+
 import numpy as np
 from sklearn.base import ClusterMixin
-from lambdaLearn.Base.TransductiveEstimator import TransductiveEstimator
-import random
 from torch.utils.data.dataset import Dataset
+
 import lambdaLearn.Config.Constrained_k_means as config
+from lambdaLearn.Base.TransductiveEstimator import TransductiveEstimator
+
 
 class Constrained_k_means(TransductiveEstimator,ClusterMixin):
     def __init__(self,k=config.k, tolerance=config.tolerance, max_iterations=config.max_iterations,

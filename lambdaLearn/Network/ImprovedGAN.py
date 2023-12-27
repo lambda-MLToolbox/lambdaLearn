@@ -1,10 +1,11 @@
 import numbers
 
 import torch
-from torch.nn.parameter import Parameter
 from torch import nn
-from torch.nn import functional as F
 from torch.autograd import Variable
+from torch.nn import functional as F
+from torch.nn.parameter import Parameter
+
 
 class LinearWeightNorm(torch.nn.Module):
     def __init__(self, in_features, out_features, bias=True, weight_scale=None, weight_init_stdv=0.1):

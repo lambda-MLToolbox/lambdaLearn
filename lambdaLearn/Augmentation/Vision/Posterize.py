@@ -1,8 +1,10 @@
-from lambdaLearn.Base.Transformer import Transformer
-import torchvision.transforms.functional as F
-import torch
-import PIL
 import numpy as np
+import PIL
+import torch
+import torchvision.transforms.functional as F
+
+from lambdaLearn.Base.Transformer import Transformer
+
 
 class Posterize(Transformer):
     def __init__(self, min_v=4,max_v=8,num_bins=10,magnitude=5,v=None,scale=255):

@@ -1,8 +1,9 @@
 from lambdaLearn.Evaluation.Cluster.Davies_Bouldin_Score import Davies_Bouldin_Score
 from lambdaLearn.Evaluation.Cluster.Fowlkes_Mallows_Score import Fowlkes_Mallows_Score
 from lambdaLearn.Evaluation.Cluster.Jaccard_Score import Jaccard_Score
-from lambdaLearn.Evaluation.Cluster.Silhouette_Score import Silhouette_Score
 from lambdaLearn.Evaluation.Cluster.Rand_Score import Rand_Score
+from lambdaLearn.Evaluation.Cluster.Silhouette_Score import Silhouette_Score
+
 k=3
 tolerance=1e-7
 max_iterations=300

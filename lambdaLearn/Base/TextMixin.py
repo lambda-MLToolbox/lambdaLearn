@@ -1,9 +1,13 @@
 import copy
-from lambdaLearn.Transform.Text.Vocab import Vocab
+
 from sklearn.pipeline import Pipeline
-from lambdaLearn.Transform.Text.Tokenizer import Tokenizer
+
 from lambdaLearn.Transform.Text.AdjustLength import AdjustLength
+from lambdaLearn.Transform.Text.Tokenizer import Tokenizer
+from lambdaLearn.Transform.Text.Vocab import Vocab
 from lambdaLearn.Transform.ToTensor import ToTensor
+
+
 class TextMixin:
     def __init__(self,word_vocab=None,vectors=None,length=300,unk_token='<unk>',pad_token='<pad>',
                  min_freq=1,special_first=True,default_index=None):

@@ -2,12 +2,12 @@ import copy
 import numbers
 import random
 
+import numpy as np
 import PIL.Image
+import torch
 
 from lambdaLearn.Base.Transformer import Transformer
 
-import numpy as np
-import torch
 
 class CutoutAbs(Transformer):
     def __init__(self, v=16,fill=(127,127,127),random_v=True):

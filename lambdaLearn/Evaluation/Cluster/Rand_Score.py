@@ -1,5 +1,7 @@
 from sklearn.metrics import rand_score
+
 from lambdaLearn.Base.ClusterEvaluation import ClusterEvaluation
+
 
 class Rand_Score(ClusterEvaluation):
     def __init__(self):

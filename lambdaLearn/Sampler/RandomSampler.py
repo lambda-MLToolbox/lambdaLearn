@@ -1,5 +1,8 @@
-from lambdaLearn.Base.BaseSampler import BaseSampler
 from torch.utils.data import sampler
+
+from lambdaLearn.Base.BaseSampler import BaseSampler
+
+
 class RandomSampler(BaseSampler):
     def __init__(self,replacement: bool = False,
                  num_samples = None, generator=None):

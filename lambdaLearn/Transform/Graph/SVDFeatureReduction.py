@@ -1,5 +1,8 @@
-from lambdaLearn.Base.Transformer import Transformer
 import torch_geometric.transforms as gt
+
+from lambdaLearn.Base.Transformer import Transformer
+
+
 class SVDFeatureReduction(Transformer):
     def __init__(self,out_channels):
         # >> Parameter:

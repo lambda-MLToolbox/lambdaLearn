@@ -1,9 +1,12 @@
-import torch
+import random
+
 import numpy as np
 import PIL
-from lambdaLearn.Base.Transformer import Transformer
+import torch
 import torchvision.transforms.functional as F
-import random
+
+from lambdaLearn.Base.Transformer import Transformer
+
 
 class Rotate(Transformer):
     def __init__(self, min_v=0,max_v=30,num_bins=10,magnitude=5,v=None):

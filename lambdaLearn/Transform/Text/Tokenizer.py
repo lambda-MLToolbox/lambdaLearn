@@ -1,5 +1,7 @@
-from lambdaLearn.Base.Transformer import Transformer
 from torchtext.data.utils import get_tokenizer
+
+from lambdaLearn.Base.Transformer import Transformer
+
 
 class Tokenizer(Transformer):
     def __init__(self,tokenizer='basic_english',language='en'):

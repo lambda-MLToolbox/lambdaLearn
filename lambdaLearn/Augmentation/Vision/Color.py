@@ -1,8 +1,9 @@
-from lambdaLearn.Base.Transformer import Transformer
-import torchvision.transforms.functional as F
-import torch
-import PIL
 import numpy as np
+import PIL
+import torch
+import torchvision.transforms.functional as F
+
+from lambdaLearn.Base.Transformer import Transformer
 
 
 class Color(Transformer):

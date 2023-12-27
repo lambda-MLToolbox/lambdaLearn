@@ -1,5 +1,6 @@
 from lambdaLearn.Base.Transformer import Transformer
 
+
 class Identity(Transformer):
     def __init__(self):
         super().__init__()

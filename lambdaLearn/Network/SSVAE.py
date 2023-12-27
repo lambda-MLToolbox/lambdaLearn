@@ -1,7 +1,9 @@
 import numbers
+
 import torch
-import torch.nn as nn
 import torch.distributions as DT
+import torch.nn as nn
+
 
 class SSVAE(nn.Module):
     """

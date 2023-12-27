@@ -1,8 +1,10 @@
-from lambdaLearn.Transform.Vision.Normalization import Normalization
-from lambdaLearn.Transform.ToTensor import ToTensor
-from lambdaLearn.Transform.ToImage import ToImage
-from sklearn.pipeline import Pipeline
 import matplotlib.pyplot as plt
+from sklearn.pipeline import Pipeline
+
+from lambdaLearn.Transform.ToImage import ToImage
+from lambdaLearn.Transform.ToTensor import ToTensor
+from lambdaLearn.Transform.Vision.Normalization import Normalization
+
 
 class VisionMixin:
     def __init__(self,mean=None,std=None):

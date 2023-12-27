@@ -1,6 +1,8 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch
+
+
 class KL_Divergence(nn.Module):
     def __init__(self,softmax_1=True,softmax_2=True,reduction='mean'):
         # >> - softmax_1: Whether to softmax the first input.

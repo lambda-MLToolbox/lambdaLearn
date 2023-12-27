@@ -1,7 +1,8 @@
-from lambdaLearn.utils import partial
-from lambdaLearn.Base.ClassifierEvaluation import ClassifierEvaluation
 from sklearn.metrics import top_k_accuracy_score
-from lambdaLearn.utils import class_status
+
+from lambdaLearn.Base.ClassifierEvaluation import ClassifierEvaluation
+from lambdaLearn.utils import class_status, partial
+
 
 class Top_k_Accurary(ClassifierEvaluation):
     def __init__(self,k=2, normalize=True, sample_weight=None, labels=None):

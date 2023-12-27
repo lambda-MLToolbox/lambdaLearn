@@ -1,5 +1,6 @@
 from lambdaLearn.Base.LambdaLR import LambdaLR
 
+
 class InverseDecaySheduler(LambdaLR):
     def __init__(self, gamma=10, power=0.75, num_training_steps=1000):
         self.gamma=gamma

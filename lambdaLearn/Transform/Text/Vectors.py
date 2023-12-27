@@ -1,6 +1,9 @@
-from torchtext import vocab
-from lambdaLearn.Base.Transformer import Transformer
 import torch
+from torchtext import vocab
+
+from lambdaLearn.Base.Transformer import Transformer
+
+
 class Vectors(Transformer):
     def __init__(self,name='840B', cache=None, url=None, unk_init=None,pad_init=None, max_vectors=None,lower_case_backup=True,
                  pad_token='<pad>',unk_token='<unk>'):

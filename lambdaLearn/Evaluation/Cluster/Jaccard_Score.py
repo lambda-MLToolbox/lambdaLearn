@@ -1,6 +1,8 @@
 from sklearn.metrics import jaccard_score
+
 from lambdaLearn.Base.ClusterEvaluation import ClusterEvaluation
 from lambdaLearn.utils import partial
+
 
 class Jaccard_Score(ClusterEvaluation):
     def __init__(self, labels=None, pos_label=1,

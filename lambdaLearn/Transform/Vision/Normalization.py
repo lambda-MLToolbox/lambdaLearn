@@ -1,5 +1,8 @@
 from torchvision.transforms import transforms
+
 from lambdaLearn.Base.Transformer import Transformer
+
+
 class Normalization(Transformer):
     def __init__(self,mean=None,std=None):
         super().__init__()

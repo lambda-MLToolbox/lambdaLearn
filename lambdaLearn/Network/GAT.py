@@ -1,6 +1,7 @@
 import torch
-from torch_geometric.nn import  GATConv
 import torch.nn.functional as F
+from torch_geometric.nn import GATConv
+
 
 class GAT(torch.nn.Module):
     def __init__(self, dim_in, num_classes, dim_hidden=16,  heads=8, dropout=0.6):

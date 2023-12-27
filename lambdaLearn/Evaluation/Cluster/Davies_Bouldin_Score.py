@@ -1,5 +1,7 @@
-from lambdaLearn.Base.ClusterEvaluation import ClusterEvaluation
 from sklearn.metrics import davies_bouldin_score
+
+from lambdaLearn.Base.ClusterEvaluation import ClusterEvaluation
+
 
 class Davies_Bouldin_Score(ClusterEvaluation):
     def __init__(self):

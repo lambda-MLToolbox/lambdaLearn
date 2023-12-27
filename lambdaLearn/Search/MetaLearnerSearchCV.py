@@ -1,22 +1,29 @@
-from sklearn.model_selection._search import BaseSearchCV,ParameterGrid
-from collections.abc import Mapping
-from sklearn.utils import check_random_state
-import numpy as np
 import time
-from sklearn.model_selection._validation import _fit_and_score
-from sklearn.model_selection._validation import _insert_error_scores
-from sklearn.model_selection._validation import _warn_about_fit_failures
 from collections import defaultdict
-from sklearn.model_selection._split import check_cv
-from sklearn.metrics._scorer import _check_multimetric_scoring
-from sklearn.metrics import check_scoring
-from sklearn.utils.validation import indexable, _check_fit_params
-from joblib import Parallel
+from collections.abc import Mapping
 from itertools import product
-from sklearn.base import  is_classifier, clone
-from sklearn.utils.fixes import delayed
-from sklearn.model_selection._search import ParameterSampler
+
+import numpy as np
+from joblib import Parallel
+from sklearn.base import clone, is_classifier
+from sklearn.metrics import check_scoring
+from sklearn.metrics._scorer import _check_multimetric_scoring
+from sklearn.model_selection._search import (
+    BaseSearchCV,
+    ParameterGrid,
+    ParameterSampler,
+)
+from sklearn.model_selection._split import check_cv
+from sklearn.model_selection._validation import (
+    _fit_and_score,
+    _insert_error_scores,
+    _warn_about_fit_failures,
+)
 from sklearn.svm import SVR
+from sklearn.utils import check_random_state
+from sklearn.utils.fixes import delayed
+from sklearn.utils.validation import _check_fit_params, indexable
+
 
 class MetaLearnerSearchCV(BaseSearchCV):
     def __init__(

@@ -1,7 +1,10 @@
+from collections import Counter, OrderedDict
+
 from torchtext.vocab import vocab
-from collections import Counter,OrderedDict
+
 from lambdaLearn.Base.Transformer import Transformer
 from lambdaLearn.Transform.Text.Tokenizer import Tokenizer
+
 
 class Vocab(Transformer):
     def __init__(self,word_vocab=None,vectors=None,text=None,min_freq=1,specials=["<unk>","<pad>"],special_first=True,default_index=None,tokenizer=None):

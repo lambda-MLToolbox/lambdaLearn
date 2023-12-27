@@ -1,6 +1,7 @@
-from lambdaLearn.Base.Transformer import Transformer
-from sklearn.utils import check_random_state
 import numpy as np
+from sklearn.utils import check_random_state
+
+from lambdaLearn.Base.Transformer import Transformer
 
 
 class DropEdges(Transformer):

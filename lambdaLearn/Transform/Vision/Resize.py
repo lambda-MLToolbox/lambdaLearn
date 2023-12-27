@@ -1,9 +1,12 @@
-from lambdaLearn.Base.Transformer import Transformer
-import torchvision.transforms.functional as F
-import PIL
 import numpy as np
+import PIL
+import torchvision.transforms.functional as F
 from torchvision.transforms import InterpolationMode
+
+from lambdaLearn.Base.Transformer import Transformer
 from lambdaLearn.utils import partial
+
+
 class Resize(Transformer):
     def __init__(self,size, interpolation = InterpolationMode.BILINEAR,
            max_size = None, antialias = None):

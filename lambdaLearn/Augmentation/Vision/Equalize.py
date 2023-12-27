@@ -1,8 +1,10 @@
-from lambdaLearn.Base.Transformer import Transformer
-import torchvision.transforms.functional as F
+import numpy as np
 import PIL
 import torch
-import numpy as np
+import torchvision.transforms.functional as F
+
+from lambdaLearn.Base.Transformer import Transformer
+
 
 class Equalize(Transformer):
     def __init__(self,scale=255):

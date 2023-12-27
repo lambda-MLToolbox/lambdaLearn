@@ -1,5 +1,8 @@
-import torch
 import copy
+
+import torch
+
+
 class SDNE(torch.nn.Module):
     def __init__(self, dim_in, hidden_layers, device="cpu"):
         # >> Parameter:

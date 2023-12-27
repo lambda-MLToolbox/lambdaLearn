@@ -1,8 +1,10 @@
-import torch
 import numpy as np
-from lambdaLearn.Base.Transformer import Transformer
-from torchvision import transforms
 import PIL.Image
+import torch
+from torchvision import transforms
+
+from lambdaLearn.Base.Transformer import Transformer
+
 
 class RandomHorizontalFlip(Transformer):
     def __init__(self):

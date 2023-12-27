@@ -1,4 +1,6 @@
 from lambdaLearn.Base.Transformer import Transformer
+
+
 class MaxAbsScaler(Transformer):
     def __init__(self,max_abs=None):
         super().__init__()

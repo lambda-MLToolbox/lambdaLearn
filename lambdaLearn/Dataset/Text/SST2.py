@@ -1,11 +1,14 @@
-from lambdaLearn.Dataset.SemiDataset import SemiDataset
-from lambdaLearn.Base.TextMixin import TextMixin
-from torchtext.utils import download_from_url,extract_archive
-from lambdaLearn.Split.DataSplit import DataSplit
-from lambdaLearn.Dataset.LabeledDataset import LabeledDataset
-from lambdaLearn.Dataset.UnlabeledDataset import UnlabeledDataset
-from lambdaLearn.Dataset.TrainDataset import TrainDataset
 import os
+
+from torchtext.utils import download_from_url, extract_archive
+
+from lambdaLearn.Base.TextMixin import TextMixin
+from lambdaLearn.Dataset.LabeledDataset import LabeledDataset
+from lambdaLearn.Dataset.SemiDataset import SemiDataset
+from lambdaLearn.Dataset.TrainDataset import TrainDataset
+from lambdaLearn.Dataset.UnlabeledDataset import UnlabeledDataset
+from lambdaLearn.Split.DataSplit import DataSplit
+
 
 class  SST2(SemiDataset,TextMixin):
     URL = "https://dl.fbaipublicfiles.com/glue/data/SST-2.zip"

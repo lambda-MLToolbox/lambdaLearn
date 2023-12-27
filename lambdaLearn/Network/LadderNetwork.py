@@ -1,10 +1,11 @@
 import numbers
 
-import torch
 import numpy as np
-from torch.nn.parameter import Parameter
-from torch.autograd import Variable
+import torch
 import torch.nn as nn
+from torch.autograd import Variable
+from torch.nn.parameter import Parameter
+
 
 class Encoder(torch.nn.Module):
     def __init__(self, dim_in, dim_out, activation,

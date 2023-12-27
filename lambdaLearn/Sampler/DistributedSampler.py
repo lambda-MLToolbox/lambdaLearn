@@ -1,5 +1,8 @@
-import  torch.utils.data.distributed as dt
+import torch.utils.data.distributed as dt
+
 from lambdaLearn.Base.BaseSampler import BaseSampler
+
+
 class DistributedSampler(BaseSampler):
     def __init__(self,num_replicas=None, rank=None, shuffle=True, seed=0, drop_last=False):
         # > - Parameter:

@@ -1,8 +1,12 @@
 import math
+from collections import Counter, defaultdict
+
 import numpy as np
+
 from lambdaLearn.Base.Transformer import Transformer
-from collections import Counter,defaultdict
 from lambdaLearn.Transform.Text.Tokenizer import Tokenizer
+
+
 class TFIDFReplacement(Transformer):
     def __init__(self,text,p=0.7,tokenizer=None,cache_len=100000):
         # >> Parameter:

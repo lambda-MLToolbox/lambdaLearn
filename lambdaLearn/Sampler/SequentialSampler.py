@@ -1,5 +1,8 @@
-from lambdaLearn.Base.BaseSampler import BaseSampler
 from torch.utils.data import sampler
+
+from lambdaLearn.Base.BaseSampler import BaseSampler
+
+
 class SequentialSampler(BaseSampler):
     def __init__(self):
         super().__init__()

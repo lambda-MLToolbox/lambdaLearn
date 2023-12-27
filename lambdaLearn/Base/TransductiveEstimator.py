@@ -1,5 +1,7 @@
-from .SemiEstimator import SemiEstimator
 from abc import abstractmethod
+
+from .SemiEstimator import SemiEstimator
+
 
 class TransductiveEstimator(SemiEstimator):
     __semi_type__='Transductive'
