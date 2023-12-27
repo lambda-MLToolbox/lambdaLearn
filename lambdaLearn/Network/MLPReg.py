@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+
+
 class MLPReg(torch.nn.Module):
     # define model elements
     def __init__(self, dim_in = 28 ** 2,hidden_dim=[10],

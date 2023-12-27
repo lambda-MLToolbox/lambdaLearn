@@ -1,10 +1,13 @@
-from lambdaLearn.Base.Transformer import Transformer
-import torchvision.transforms.functional as F
 import math
 import random
-import torch
-import PIL
+
 import numpy as np
+import PIL
+import torch
+import torchvision.transforms.functional as F
+
+from lambdaLearn.Base.Transformer import Transformer
+
 
 class ShearX(Transformer):
     def __init__(self, min_v=0,max_v=0.3,num_bins=10,magnitude=5,v=None):

@@ -1,6 +1,7 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch
+
 
 class Consistency(nn.Module):
     def __init__(self,reduction='mean'):

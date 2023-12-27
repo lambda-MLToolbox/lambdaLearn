@@ -1,6 +1,8 @@
-from lambdaLearn.Base.ClassifierEvaluation import ClassifierEvaluation
 from sklearn.metrics import precision_score
+
+from lambdaLearn.Base.ClassifierEvaluation import ClassifierEvaluation
 from lambdaLearn.utils import partial
+
 
 class Precision(ClassifierEvaluation):
     def __init__(self,labels=None,

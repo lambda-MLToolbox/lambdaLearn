@@ -1,9 +1,11 @@
-from lambdaLearn.Base.Transformer import Transformer
-from torchvision import transforms
-from lambdaLearn.utils import partial
-import PIL
 import numpy as np
+import PIL
 import torch
+from torchvision import transforms
+
+from lambdaLearn.Base.Transformer import Transformer
+from lambdaLearn.utils import partial
+
 
 class RandomCrop(Transformer):
     def __init__(self, padding=None, pad_if_needed=False, fill=0, padding_mode="constant"):

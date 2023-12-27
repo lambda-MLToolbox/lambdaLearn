@@ -1,5 +1,7 @@
+from torch.optim import sgd
+
 from lambdaLearn.Base.BaseOptimizer import BaseOptimizer
-from torch.optim import  sgd
+
 
 class SGD(BaseOptimizer):
     def __init__(self, lr=0.01, momentum=0, dampening=0, weight_decay=0, nesterov=False):

@@ -1,9 +1,9 @@
 from lambdaLearn.Evaluation.Classifier.Accuracy import Accuracy
-from lambdaLearn.Evaluation.Classifier.Precision import Precision
-from lambdaLearn.Evaluation.Classifier.Recall import Recall
-from lambdaLearn.Evaluation.Classifier.F1 import F1
 from lambdaLearn.Evaluation.Classifier.AUC import AUC
 from lambdaLearn.Evaluation.Classifier.Confusion_Matrix import Confusion_Matrix
+from lambdaLearn.Evaluation.Classifier.F1 import F1
+from lambdaLearn.Evaluation.Classifier.Precision import Precision
+from lambdaLearn.Evaluation.Classifier.Recall import Recall
 
 kernel = "rbf"
 gamma = 1

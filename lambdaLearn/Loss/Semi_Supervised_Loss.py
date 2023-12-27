@@ -1,4 +1,6 @@
 import torch.nn as nn
+
+
 class Semi_Supervised_Loss(nn.Module):
     def __init__(self,lambda_u=1.0):
         # lambda_u: The weight of unsupervised loss.

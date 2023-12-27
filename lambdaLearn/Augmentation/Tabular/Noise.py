@@ -1,9 +1,10 @@
 import numbers
 
+import numpy as np
 import torch
 
 from lambdaLearn.Base.Transformer import Transformer
-import numpy as np
+
 
 class Noise(Transformer):
     def __init__(self,noise_level=0.1):

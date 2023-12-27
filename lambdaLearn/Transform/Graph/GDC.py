@@ -1,5 +1,8 @@
-from lambdaLearn.Base.Transformer import Transformer
 import torch_geometric.transforms as gt
+
+from lambdaLearn.Base.Transformer import Transformer
+
+
 class GDC(Transformer):
     def __init__(self,self_loop_weight=1, normalization_in='sym',
                  normalization_out='col',

@@ -3,14 +3,14 @@ from distutils.version import LooseVersion
 from functools import partial
 from numbers import Number
 from reprlib import recursive_repr
+
+import numpy as np
 import sklearn
 import torch
-from torch.utils.data import dataset
-import numpy as np
+import torch.nn as nn
 from scipy import sparse
 from torch.nn.utils.rnn import PackedSequence
-import torch.nn as nn
-
+from torch.utils.data import dataset
 
 if LooseVersion(sklearn.__version__) >= '0.22.0':
     from sklearn.utils import _safe_indexing as safe_indexing
@@ -54,7 +54,7 @@ def indexing_other(data, i):
         return data[i]
     #if isinstance(i,(list,np.ndarray)):
     #print(type(i))
-    if isinstance(i,(list,np.ndarray)):    
+    if isinstance(i,(list,np.ndarray)):
         _data=[data[_] for _ in i]
         if isinstance(data,(np.ndarray)):
             _data=np.array(_data)

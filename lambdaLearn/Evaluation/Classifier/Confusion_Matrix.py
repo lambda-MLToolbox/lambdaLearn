@@ -1,6 +1,8 @@
-from lambdaLearn.utils import partial
-from lambdaLearn.Base.ClassifierEvaluation import ClassifierEvaluation
 from sklearn.metrics import confusion_matrix
+
+from lambdaLearn.Base.ClassifierEvaluation import ClassifierEvaluation
+from lambdaLearn.utils import partial
+
 
 class Confusion_Matrix(ClassifierEvaluation):
     def __init__(self,labels=None, sample_weight=None, normalize=None):

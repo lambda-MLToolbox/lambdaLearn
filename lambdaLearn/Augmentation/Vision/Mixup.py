@@ -1,5 +1,7 @@
-from lambdaLearn.Base.Transformer import Transformer
 import numpy as np
+
+from lambdaLearn.Base.Transformer import Transformer
+
 
 class Mixup(Transformer):
     def __init__(self, alpha=0.5):

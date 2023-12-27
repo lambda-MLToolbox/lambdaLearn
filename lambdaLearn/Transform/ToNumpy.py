@@ -1,7 +1,9 @@
-from lambdaLearn.utils import to_numpy,is_pandas_ndframe,is_torch_data_type
 import numpy as np
 
 from lambdaLearn.Base.Transformer import Transformer
+from lambdaLearn.utils import is_pandas_ndframe, is_torch_data_type, to_numpy
+
+
 class ToNumpy(Transformer):
     def __init__(self):
         super().__init__()

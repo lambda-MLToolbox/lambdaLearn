@@ -1,8 +1,11 @@
-import torch
-import PIL
 import numpy as np
-from lambdaLearn.Base.Transformer import Transformer
+import PIL
+import torch
 import torchvision.transforms as tvt
+
+from lambdaLearn.Base.Transformer import Transformer
+
+
 class ToTensor(Transformer):
     def __init__(self,dtype=None,image=False):
         # > - Parameter:

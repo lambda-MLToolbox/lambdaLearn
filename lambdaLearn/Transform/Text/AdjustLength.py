@@ -1,6 +1,8 @@
 from lambdaLearn.Base.Transformer import Transformer
 from lambdaLearn.Transform.Text.PadSequence import PadSequence
 from lambdaLearn.Transform.Text.Truncate import Truncate
+
+
 class AdjustLength(Transformer):
     def __init__(self,length=300,pad_val=None,pos=0):
         # >> Parameter:

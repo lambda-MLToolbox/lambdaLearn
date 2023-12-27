@@ -1,6 +1,8 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch
+
+
 class Cross_Entropy(nn.Module):
     def __init__(self, use_hard_labels=True, reduction='mean'):
         # >> Parameter

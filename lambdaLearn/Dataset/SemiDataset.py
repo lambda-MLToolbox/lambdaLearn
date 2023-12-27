@@ -1,10 +1,13 @@
-from torch.utils.data import Dataset
-from .TrainDataset import TrainDataset
-from .LabeledDataset import LabeledDataset
-from .UnlabeledDataset import UnlabeledDataset
-from ..utils import get_indexing_method
-from ..Split.DataSplit import DataSplit
 import copy
+
+from torch.utils.data import Dataset
+
+from ..Split.DataSplit import DataSplit
+from ..utils import get_indexing_method
+from .LabeledDataset import LabeledDataset
+from .TrainDataset import TrainDataset
+from .UnlabeledDataset import UnlabeledDataset
+
 
 class SemiDataset(Dataset):
     def __init__(self,

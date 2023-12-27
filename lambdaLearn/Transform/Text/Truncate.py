@@ -1,4 +1,6 @@
 from lambdaLearn.Base.Transformer import Transformer
+
+
 class Truncate(Transformer):
     def __init__(self,length=300,pos=0):
         # >> Paraameter:

@@ -1,8 +1,10 @@
-import numpy as np
-from lambdaLearn.utils import get_len
 from math import ceil
+
+import numpy as np
 from sklearn.utils import check_random_state
-from lambdaLearn.utils import to_numpy,get_indexing_method,indexing
+
+from lambdaLearn.utils import get_indexing_method, get_len, indexing, to_numpy
+
 
 def get_split_num(X,size_split=0.1):
     len_X = get_len(X)

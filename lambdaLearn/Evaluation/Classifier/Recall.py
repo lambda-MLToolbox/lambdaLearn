@@ -1,6 +1,8 @@
-from lambdaLearn.Base.ClassifierEvaluation import ClassifierEvaluation
 from sklearn.metrics import recall_score
+
+from lambdaLearn.Base.ClassifierEvaluation import ClassifierEvaluation
 from lambdaLearn.utils import partial
+
 
 class Recall(ClassifierEvaluation):
     def __init__(self,

@@ -1,4 +1,6 @@
 from torch.utils.data.sampler import Sampler
+
+
 class BaseSampler:
     def __init__(self):
         pass

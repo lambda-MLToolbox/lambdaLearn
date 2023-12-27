@@ -1,12 +1,14 @@
-from lambdaLearn.Dataset.SemiDataset import SemiDataset
-from lambdaLearn.Base.VisionMixin import VisionMixin
-from lambdaLearn.Transform.ToTensor import ToTensor
-from lambdaLearn.Transform.ToImage import ToImage
-from lambdaLearn.Split.DataSplit import DataSplit
-from lambdaLearn.Dataset.TrainDataset import TrainDataset
-from lambdaLearn.Dataset.LabeledDataset import LabeledDataset
-from lambdaLearn.Dataset.UnlabeledDataset import UnlabeledDataset
 from torchvision.datasets import mnist
+
+from lambdaLearn.Base.VisionMixin import VisionMixin
+from lambdaLearn.Dataset.LabeledDataset import LabeledDataset
+from lambdaLearn.Dataset.SemiDataset import SemiDataset
+from lambdaLearn.Dataset.TrainDataset import TrainDataset
+from lambdaLearn.Dataset.UnlabeledDataset import UnlabeledDataset
+from lambdaLearn.Split.DataSplit import DataSplit
+from lambdaLearn.Transform.ToImage import ToImage
+from lambdaLearn.Transform.ToTensor import ToTensor
+
 
 class Mnist(SemiDataset,VisionMixin):
     def __init__(

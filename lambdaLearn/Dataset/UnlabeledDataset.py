@@ -1,8 +1,10 @@
 import copy
+
 import torch
-from lambdaLearn.utils import indexing
 from torch.utils.data.dataset import Dataset
-from lambdaLearn.utils import get_len,get_indexing_method
+
+from lambdaLearn.utils import get_indexing_method, get_len, indexing
+
 
 class UnlabeledDataset(Dataset):
     def __init__(self,

@@ -1,9 +1,11 @@
-import PIL,PIL.ImageEnhance
+import numpy as np
+import PIL
+import PIL.ImageEnhance
 import torch
 
-from lambdaLearn.Base.Transformer import Transformer
 from lambdaLearn.Augmentation.Vision.CutoutAbs import CutoutAbs
-import numpy as np
+from lambdaLearn.Base.Transformer import Transformer
+
 
 class Cutout(Transformer):
     def __init__(self, v=0.5,fill=(127,127,127),random_v=True):

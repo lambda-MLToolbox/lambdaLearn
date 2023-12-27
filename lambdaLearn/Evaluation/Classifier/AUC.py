@@ -1,7 +1,8 @@
-from lambdaLearn.Base.ClassifierEvaluation import ClassifierEvaluation
 from sklearn.metrics import roc_auc_score
-from lambdaLearn.utils import partial
-from lambdaLearn.utils import class_status
+
+from lambdaLearn.Base.ClassifierEvaluation import ClassifierEvaluation
+from lambdaLearn.utils import class_status, partial
+
 
 class AUC(ClassifierEvaluation):
     def __init__(self,

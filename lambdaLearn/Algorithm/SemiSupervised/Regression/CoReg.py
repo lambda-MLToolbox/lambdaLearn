@@ -1,11 +1,14 @@
 import copy
+
+import numpy as np
 from sklearn.base import RegressorMixin
-from lambdaLearn.Base.InductiveEstimator import InductiveEstimator
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.utils import shuffle
-import numpy as np
 from torch.utils.data.dataset import Dataset
+
 import lambdaLearn.Config.CoReg as config
+from lambdaLearn.Base.InductiveEstimator import InductiveEstimator
+
 
 class CoReg(InductiveEstimator,RegressorMixin):
     def __init__(self, k1=config.k1, k2=config.k2, p1=config.p1, p2=config.p2,

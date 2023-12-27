@@ -1,11 +1,13 @@
 import math
 import typing as ty
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.nn.init as nn_init
-from torch.nn import ModuleList
 from torch import Tensor
+from torch.nn import ModuleList
+
 
 class Tokenizer(nn.Module):
     category_offsets: ty.Optional[Tensor]

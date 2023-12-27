@@ -1,7 +1,9 @@
 import copy
-from lambdaLearn.utils import indexing
+
 from torch.utils.data.dataset import Dataset
-from lambdaLearn.utils import get_len,get_indexing_method
+
+from lambdaLearn.utils import get_indexing_method, get_len, indexing
+
 
 class LabeledDataset(Dataset):
     def __init__(self,

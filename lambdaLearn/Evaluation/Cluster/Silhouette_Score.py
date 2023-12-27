@@ -1,6 +1,8 @@
 from sklearn.metrics import silhouette_score
+
 from lambdaLearn.Base.ClusterEvaluation import ClusterEvaluation
 from lambdaLearn.utils import partial
+
 
 class Silhouette_Score(ClusterEvaluation):
     def __init__(self, metric="euclidean", sample_size=None, random_state=None):

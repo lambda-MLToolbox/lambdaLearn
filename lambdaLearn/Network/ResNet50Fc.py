@@ -1,10 +1,12 @@
 import copy
-from torch.nn.parameter import Parameter
-from torchvision import models
-import torch.nn as nn
+
 import torch
+import torch.nn as nn
 from torch.autograd import Variable
 from torch.nn import ModuleList
+from torch.nn.parameter import Parameter
+from torchvision import models
+
 
 def to_var(x, requires_grad=True,device='cuda:0'):
     if torch.cuda.is_available():

@@ -1,4 +1,6 @@
 from torch import nn
+
+
 class DataParallel:
     def __init__(self, device_ids=None, output_device=None, dim=0):
         # >> Parameter

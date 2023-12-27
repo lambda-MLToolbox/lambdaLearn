@@ -1,5 +1,8 @@
-from lambdaLearn.Base.LambdaLR import LambdaLR
 import math
+
+from lambdaLearn.Base.LambdaLR import LambdaLR
+
+
 class CosineWarmup(LambdaLR):
     def __init__(self,
                  num_training_steps,

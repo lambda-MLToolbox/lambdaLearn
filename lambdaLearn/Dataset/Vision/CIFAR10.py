@@ -1,13 +1,16 @@
-import numpy as np
-from lambdaLearn.Dataset.SemiDataset import SemiDataset
-from lambdaLearn.Base.VisionMixin import VisionMixin
-from torchvision.datasets.utils import check_integrity, download_and_extract_archive
 import os
 import pickle
-from lambdaLearn.Split.DataSplit import DataSplit
-from lambdaLearn.Dataset.TrainDataset import TrainDataset
+
+import numpy as np
+from torchvision.datasets.utils import check_integrity, download_and_extract_archive
+
+from lambdaLearn.Base.VisionMixin import VisionMixin
 from lambdaLearn.Dataset.LabeledDataset import LabeledDataset
+from lambdaLearn.Dataset.SemiDataset import SemiDataset
+from lambdaLearn.Dataset.TrainDataset import TrainDataset
 from lambdaLearn.Dataset.UnlabeledDataset import UnlabeledDataset
+from lambdaLearn.Split.DataSplit import DataSplit
+
 
 class CIFAR10(SemiDataset,VisionMixin):
     base_folder = "cifar-10-batches-py"

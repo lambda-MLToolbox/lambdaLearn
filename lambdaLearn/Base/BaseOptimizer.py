@@ -1,4 +1,6 @@
 from torch.optim.optimizer import Optimizer
+
+
 class BaseOptimizer:
     def __init__(self,defaults):
         # >> - defaults: A dict containing default values of optimization options (used when a parameter group doesn't specify them).

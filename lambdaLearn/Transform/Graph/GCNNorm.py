@@ -1,5 +1,8 @@
-from lambdaLearn.Base.Transformer import Transformer
 import torch_geometric.transforms as gt
+
+from lambdaLearn.Base.Transformer import Transformer
+
+
 class GCNNorm(Transformer):
     def __init__(self,add_self_loops=True):
         # >> Parameter:

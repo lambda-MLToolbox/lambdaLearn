@@ -1,6 +1,8 @@
-from lambdaLearn.Base.ClassifierEvaluation import ClassifierEvaluation
 from sklearn.metrics import f1_score
+
+from lambdaLearn.Base.ClassifierEvaluation import ClassifierEvaluation
 from lambdaLearn.utils import partial
+
 
 class F1(ClassifierEvaluation):
     def __init__(self,

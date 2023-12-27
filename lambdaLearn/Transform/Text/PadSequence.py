@@ -1,4 +1,6 @@
 from lambdaLearn.Base.Transformer import Transformer
+
+
 class PadSequence(Transformer):
     def __init__(self,length=300,pad_val=None):
         # > Parameter:

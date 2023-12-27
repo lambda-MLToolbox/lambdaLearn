@@ -1,6 +1,8 @@
-from lambdaLearn.Base.Transformer import Transformer
 import random
+
+from lambdaLearn.Base.Transformer import Transformer
 from lambdaLearn.Transform.Text.Tokenizer import Tokenizer
+
 
 class RandomDeletion(Transformer):
     def __init__(self,p=0.5,tokenizer=None):

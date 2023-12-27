@@ -1,6 +1,8 @@
-from lambdaLearn.Base.ClusterEvaluation import ClusterEvaluation
 from sklearn.metrics import fowlkes_mallows_score
+
+from lambdaLearn.Base.ClusterEvaluation import ClusterEvaluation
 from lambdaLearn.utils import partial
+
 
 class Fowlkes_Mallows_Score(ClusterEvaluation):
     def __init__(self,sparse=False):

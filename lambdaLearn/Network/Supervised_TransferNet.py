@@ -1,8 +1,9 @@
-import torch.nn as nn
-from torchvision import models
-import torch
 import numpy as np
+import torch
+import torch.nn as nn
 from torch.autograd import Function
+from torchvision import models
+
 resnet_dict = {
     "resnet18": models.resnet18,
     "resnet34": models.resnet34,
@@ -376,6 +377,7 @@ def BNM(src, tar):
 import sklearn.metrics
 from cvxopt import matrix, solvers
 
+
 def kernel(ker, X1, X2, gamma):
     K = None
     if ker == 'linear':
@@ -434,6 +436,8 @@ class KMM:
         return beta
 
 from LAMDA_SSL.utils import to_numpy
+
+
 class Weight(nn.Module):
     def __init__(self,device='cpu',**kwargs):
         super(Weight, self).__init__()

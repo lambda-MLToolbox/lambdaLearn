@@ -1,7 +1,10 @@
-from lambdaLearn.Base.Transformer import Transformer
-import numpy as np
 import random
+
+import numpy as np
 import PIL
+
+from lambdaLearn.Base.Transformer import Transformer
+
 
 def AutoContrast(X, **kwarg):
     return PIL.ImageOps.autocontrast(X)

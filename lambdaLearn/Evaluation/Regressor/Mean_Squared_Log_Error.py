@@ -1,6 +1,8 @@
-from lambdaLearn.Base.RegressorEvaluation import RegressorEvaluation
 from sklearn.metrics import mean_squared_log_error
+
+from lambdaLearn.Base.RegressorEvaluation import RegressorEvaluation
 from lambdaLearn.utils import partial
+
 
 class Mean_Squared_Log_Error(RegressorEvaluation):
     def __init__(self,sample_weight=None, multioutput="uniform_average",squared=True):

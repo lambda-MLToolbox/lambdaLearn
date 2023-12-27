@@ -1,4 +1,6 @@
 from lambdaLearn.Base.Transformer import Transformer
+
+
 class MinMaxScaler(Transformer):
     def __init__(self,min_val=None,max_val=None):
         super().__init__()

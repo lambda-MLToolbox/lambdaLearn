@@ -1,9 +1,9 @@
+import numpy as np
+import PIL
 import torch
+from PIL import Image
 
 from lambdaLearn.Base.Transformer import Transformer
-import PIL
-from PIL import Image
-import numpy as np
 
 
 class ToImage(Transformer):

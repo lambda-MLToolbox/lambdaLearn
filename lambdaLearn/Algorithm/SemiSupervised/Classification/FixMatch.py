@@ -1,12 +1,14 @@
 import copy
-from lambdaLearn.Base.InductiveEstimator import InductiveEstimator
-from lambdaLearn.Base.DeepModelMixin import DeepModelMixin
+
+import torch
 from sklearn.base import ClassifierMixin
+
 import lambdaLearn.Config.FixMatch as config
+from lambdaLearn.Base.DeepModelMixin import DeepModelMixin
+from lambdaLearn.Base.InductiveEstimator import InductiveEstimator
 from lambdaLearn.Loss.Cross_Entropy import Cross_Entropy
 from lambdaLearn.Loss.Semi_Supervised_Loss import Semi_Supervised_Loss
 
-import torch
 
 class FixMatch(InductiveEstimator,DeepModelMixin,ClassifierMixin):
     def __init__(self,

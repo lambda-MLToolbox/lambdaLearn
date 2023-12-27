@@ -1,5 +1,7 @@
-from lambdaLearn.Transform.Graph.NormalizeFeatures import NormalizeFeatures
 from sklearn.pipeline import Pipeline
+
+from lambdaLearn.Transform.Graph.NormalizeFeatures import NormalizeFeatures
+
 
 class GraphMixin:
     def __init__(self):
