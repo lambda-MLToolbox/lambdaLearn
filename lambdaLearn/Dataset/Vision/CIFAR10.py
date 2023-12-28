@@ -12,7 +12,7 @@ from lambdaLearn.Dataset.UnlabeledDataset import UnlabeledDataset
 from lambdaLearn.Split.DataSplit import DataSplit
 
 
-class CIFAR10(SemiDataset,VisionMixin):
+class CIFAR10(SemiDataset, VisionMixin):
     base_folder = "cifar-10-batches-py"
     url = "https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz"
     filename = "cifar-10-python.tar.gz"
@@ -33,8 +33,8 @@ class CIFAR10(SemiDataset,VisionMixin):
         "key": "label_names",
         "md5": "5ff9c542aee3614f3951f8cda6e48888",
     }
-    mean=[0.4914, 0.4822, 0.4465]
-    std=[0.2471, 0.2435, 0.2616]
+    mean = [0.4914, 0.4822, 0.4465]
+    std = [0.2471, 0.2435, 0.2616]
 
     def __init__(
         self,
@@ -42,8 +42,8 @@ class CIFAR10(SemiDataset,VisionMixin):
         default_transforms=False,
         pre_transform=None,
         transforms=None,
-        transform = None,
-        target_transform = None,
+        transform=None,
+        target_transform=None,
         unlabeled_transform=None,
         valid_transform=None,
         test_transform=None,
@@ -53,47 +53,55 @@ class CIFAR10(SemiDataset,VisionMixin):
         shuffle=True,
         random_state=None,
         download: bool = False,
-
     ) -> None:
-        self.default_transforms=default_transforms
-        self.labeled_X=None
-        self.labeled_y=None
-        self.unlabeled_X=None
-        self.unlabeled_y=None
-        self.valid_X=None
-        self.valid_y=None
-        self.test_X=None
-        self.test_y=None
+        self.default_transforms = default_transforms
+        self.labeled_X = None
+        self.labeled_y = None
+        self.unlabeled_X = None
+        self.unlabeled_y = None
+        self.valid_X = None
+        self.valid_y = None
+        self.test_X = None
+        self.test_y = None
 
-        self.labeled_dataset=None
-        self.unlabeled_dataset=None
-        self.train_dataset=None
+        self.labeled_dataset = None
+        self.unlabeled_dataset = None
+        self.train_dataset = None
         self.valid_dataset = None
-        self.test_dataset=None
+        self.test_dataset = None
 
-        self.data_initialized=False
+        self.data_initialized = False
 
-        self.len_test=None
+        self.len_test = None
         self.len_valid = None
-        self.len_labeled=None
-        self.len_unlabeled=None
+        self.len_labeled = None
+        self.len_unlabeled = None
 
-        self.labeled_X_indexing_method=None
-        self.labeled_y_indexing_method =None
-        self.unlabeled_X_indexing_method =None
-        self.unlabeled_y_indexing_method =None
-        self.valid_X_indexing_method=None
-        self.valid_indexing_method=None
-        self.test_X_indexing_method=None
-        self.test_y_indexing_method=None
+        self.labeled_X_indexing_method = None
+        self.labeled_y_indexing_method = None
+        self.unlabeled_X_indexing_method = None
+        self.unlabeled_y_indexing_method = None
+        self.valid_X_indexing_method = None
+        self.valid_indexing_method = None
+        self.test_X_indexing_method = None
+        self.test_y_indexing_method = None
 
-
-        SemiDataset.__init__(self,pre_transform=pre_transform,transforms=transforms,transform=transform, target_transform=target_transform,
-                             unlabeled_transform=unlabeled_transform,test_transform=test_transform,
-                             valid_transform=valid_transform,labeled_size=labeled_size,valid_size=valid_size,
-                             stratified=stratified,shuffle=shuffle,random_state=random_state)
-        VisionMixin.__init__(self,mean=self.mean,std=self.std)
-
+        SemiDataset.__init__(
+            self,
+            pre_transform=pre_transform,
+            transforms=transforms,
+            transform=transform,
+            target_transform=target_transform,
+            unlabeled_transform=unlabeled_transform,
+            test_transform=test_transform,
+            valid_transform=valid_transform,
+            labeled_size=labeled_size,
+            valid_size=valid_size,
+            stratified=stratified,
+            shuffle=shuffle,
+            random_state=random_state,
+        )
+        VisionMixin.__init__(self, mean=self.mean, std=self.std)
 
         if isinstance(root, (str, bytes)):
             root = os.path.expanduser(root)
@@ -164,37 +172,48 @@ class CIFAR10(SemiDataset,VisionMixin):
         train_X = train_X.transpose((0, 2, 3, 1))
 
         if self.valid_size is not None:
-            valid_X, valid_y, train_X, train_y = DataSplit(X=train_X, y=train_y,
-                                                                   size_split=self.valid_size,
-                                                                   stratified=self.stratified,
-                                                                   shuffle=self.shuffle,
-                                                                   random_state=self.random_state
-                                                                   )
+            valid_X, valid_y, train_X, train_y = DataSplit(
+                X=train_X,
+                y=train_y,
+                size_split=self.valid_size,
+                stratified=self.stratified,
+                shuffle=self.shuffle,
+                random_state=self.random_state,
+            )
         else:
-            valid_X=None
-            valid_y=None
+            valid_X = None
+            valid_y = None
 
         if self.labeled_size is not None:
-            labeled_X, labeled_y, unlabeled_X, unlabeled_y = DataSplit(X=train_X,y=train_y,
-                                                                   size_split=self.labeled_size,
-                                                                   stratified=self.stratified,
-                                                                   shuffle=self.shuffle,
-                                                                   random_state=self.random_state
-                                                                   )
+            labeled_X, labeled_y, unlabeled_X, unlabeled_y = DataSplit(
+                X=train_X,
+                y=train_y,
+                size_split=self.labeled_size,
+                stratified=self.stratified,
+                shuffle=self.shuffle,
+                random_state=self.random_state,
+            )
         else:
-            labeled_X, labeled_y=train_X,train_y
-            unlabeled_X, unlabeled_y=None,None
-        self.test_dataset=LabeledDataset(pre_transform=self.pre_transform,transform=self.test_transform)
-        self.test_dataset.init_dataset(test_X,test_y)
-        self.valid_dataset=LabeledDataset(pre_transform=self.pre_transform,transform=self.valid_transform)
-        self.valid_dataset.init_dataset(valid_X,valid_y)
-        self.train_dataset = TrainDataset(pre_transform=self.pre_transform,transforms=self.transforms,transform=self.transform,
-                                          target_transform=self.target_transform,unlabeled_transform=self.unlabeled_transform)
-        labeled_dataset=LabeledDataset(pre_transform=self.pre_transform,transforms=self.transforms,transform=self.transform,
-                                          target_transform=self.target_transform)
+            labeled_X, labeled_y = train_X, train_y
+            unlabeled_X, unlabeled_y = None, None
+        self.test_dataset = LabeledDataset(pre_transform=self.pre_transform, transform=self.test_transform)
+        self.test_dataset.init_dataset(test_X, test_y)
+        self.valid_dataset = LabeledDataset(pre_transform=self.pre_transform, transform=self.valid_transform)
+        self.valid_dataset.init_dataset(valid_X, valid_y)
+        self.train_dataset = TrainDataset(
+            pre_transform=self.pre_transform,
+            transforms=self.transforms,
+            transform=self.transform,
+            target_transform=self.target_transform,
+            unlabeled_transform=self.unlabeled_transform,
+        )
+        labeled_dataset = LabeledDataset(
+            pre_transform=self.pre_transform,
+            transforms=self.transforms,
+            transform=self.transform,
+            target_transform=self.target_transform,
+        )
         labeled_dataset.init_dataset(labeled_X, labeled_y)
-        unlabeled_dataset=UnlabeledDataset(pre_transform=self.pre_transform,transform=self.unlabeled_transform)
+        unlabeled_dataset = UnlabeledDataset(pre_transform=self.pre_transform, transform=self.unlabeled_transform)
         unlabeled_dataset.init_dataset(unlabeled_X, unlabeled_y)
-        self.train_dataset.init_dataset(labeled_dataset=labeled_dataset,unlabeled_dataset=unlabeled_dataset)
-
-
+        self.train_dataset.init_dataset(labeled_dataset=labeled_dataset, unlabeled_dataset=unlabeled_dataset)

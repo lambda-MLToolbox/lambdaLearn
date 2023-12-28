@@ -6,7 +6,7 @@ from sklearn.utils import check_random_state
 from lambdaLearn.utils import get_indexing_method, get_len, indexing, to_numpy
 
 
-def get_split_num(X,size_split=0.1):
+def get_split_num(X, size_split=0.1):
     len_X = get_len(X)
     type_size_split = np.asarray(size_split).dtype.kind
     # if (
@@ -24,9 +24,10 @@ def get_split_num(X,size_split=0.1):
     if type_size_split == "f":
         num_1 = ceil(size_split * len_X)
     else:
-        num_1= size_split
-    num_2=len_X-num_1
-    return num_1,num_2
+        num_1 = size_split
+    num_2 = len_X - num_1
+    return num_1, num_2
+
 
 def _approximate_mode(class_counts, n_draws, rng):
     rng = check_random_state(rng)
@@ -38,7 +39,7 @@ def _approximate_mode(class_counts, n_draws, rng):
     floored = np.floor(continuous)
     # we add samples according to how much "left over" probability
     # they had, until we arrive at n_samples
-    floored=np.clip(floored,1,None)
+    floored = np.clip(floored, 1, None)
     # print(n_draws)
     # print(floored)
     need_to_add = int(n_draws - floored.sum())
@@ -62,13 +63,14 @@ def _approximate_mode(class_counts, n_draws, rng):
     # print(floored)
     return floored.astype(int)
 
-def get_split_index(y,num_1,num_2,stratified,shuffle,random_state=None):
+
+def get_split_index(y, num_1, num_2, stratified, shuffle, random_state=None):
     # print(random_state)
-    rng=check_random_state(seed=random_state)
-    num_total=num_1+num_2
+    rng = check_random_state(seed=random_state)
+    num_total = num_1 + num_2
     if stratified:
         try:
-            y_arr=to_numpy(y)
+            y_arr = to_numpy(y)
         except (AttributeError, TypeError):
             y_arr = y
         if y_arr.ndim == 2:
@@ -97,9 +99,7 @@ def get_split_index(y,num_1,num_2,stratified,shuffle,random_state=None):
 
         # Find the sorted list of instances for each class:
         # (np.unique above performs a sort, so code is O(n logn) already)
-        class_indices = np.split(
-            np.argsort(y_indices, kind="mergesort"), np.cumsum(class_counts)[:-1]
-        )
+        class_indices = np.split(np.argsort(y_indices, kind="mergesort"), np.cumsum(class_counts)[:-1])
         n_i = _approximate_mode(class_counts, num_1, rng)
         class_counts_remaining = class_counts - n_i
         t_i = class_counts_remaining
@@ -122,10 +122,11 @@ def get_split_index(y,num_1,num_2,stratified,shuffle,random_state=None):
         else:
             permutation = np.arange(num_total)
         ind_labeled = permutation[:num_1]
-        ind_unlabeled = permutation[num_1 : (num_1+ num_2)]
-    return ind_labeled,ind_unlabeled
+        ind_unlabeled = permutation[num_1 : (num_1 + num_2)]
+    return ind_labeled, ind_unlabeled
 
-def DataSplit(stratified=True,shuffle=True,random_state=None, X=None, y=None,size_split=None):
+
+def DataSplit(stratified=True, shuffle=True, random_state=None, X=None, y=None, size_split=None):
     # >> Parameter
     # >> - stratified: Whether to stratify by classes.
     # >> - shuffle: Whether to shuffle the data.
@@ -134,9 +135,14 @@ def DataSplit(stratified=True,shuffle=True,random_state=None, X=None, y=None,siz
     # >> - y: Labels of the data to be split.
     # >> - labeled_size: The scale or size of the labeled data.
     num_1, num_2 = get_split_num(X, size_split)
-    ind_1, ind_2 = get_split_index(y=y, num_1=num_1, num_2=num_2,
-                                   stratified=stratified, shuffle=shuffle,
-                                   random_state=random_state)
+    ind_1, ind_2 = get_split_index(
+        y=y,
+        num_1=num_1,
+        num_2=num_2,
+        stratified=stratified,
+        shuffle=shuffle,
+        random_state=random_state,
+    )
     X_indexing = get_indexing_method(X)
     y_indexing = get_indexing_method(y)
     X_1 = indexing(X, ind_1, X_indexing)
@@ -144,7 +150,3 @@ def DataSplit(stratified=True,shuffle=True,random_state=None, X=None, y=None,siz
     X_2 = indexing(X, ind_2, X_indexing)
     y_2 = indexing(y, ind_2, y_indexing)
     return X_1, y_1, X_2, y_2
-
-
-        
-

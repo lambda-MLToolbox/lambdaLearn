@@ -9,8 +9,15 @@ from lambdaLearn.Base.TransductiveEstimator import TransductiveEstimator
 
 
 class Constrained_Seed_k_means(TransductiveEstimator, ClusterMixin):
-    def __init__(self, k=config.k, tolerance=config.tolerance, max_iterations=config.max_iterations,evaluation=config.evaluation,
-                 verbose=config.verbose,file=config.file):
+    def __init__(
+        self,
+        k=config.k,
+        tolerance=config.tolerance,
+        max_iterations=config.max_iterations,
+        evaluation=config.evaluation,
+        verbose=config.verbose,
+        file=config.file,
+    ):
         # >> Parameter
         # >> - k: The k value for the k-means clustering algorithm.
         # >> - tolerance: Tolerance of iterative convergence.
@@ -21,11 +28,11 @@ class Constrained_Seed_k_means(TransductiveEstimator, ClusterMixin):
         self.evaluation = evaluation
         self.verbose = verbose
         self.file = file
-        self.X=None
-        self.y_pred=None
+        self.X = None
+        self.y_pred = None
         self._estimator_type = ClusterMixin._estimator_type
 
-    def fit(self, X, y=None, unlabeled_X=None,clusters=None):
+    def fit(self, X, y=None, unlabeled_X=None, clusters=None):
         assert y is not None or clusters is not None
         if clusters is None:
             clusters = {}
@@ -34,47 +41,45 @@ class Constrained_Seed_k_means(TransductiveEstimator, ClusterMixin):
             for _ in range(len(X)):
                 clusters[y[_]].add(_)
 
-        c=[]
+        c = []
         for _ in range(self.k):
-            s=clusters[_]
-            l_set=len(s)
-            if l_set==0:
-                raise ValueError('Set is empty!')
-            sum=0
+            s = clusters[_]
+            l_set = len(s)
+            if l_set == 0:
+                raise ValueError("Set is empty!")
+            sum = 0
             for idx in s:
-                sum+=X[idx]
-            sum=sum/l_set
+                sum += X[idx]
+            sum = sum / l_set
             c.append(sum)
-        c=np.array(c)
+        c = np.array(c)
 
-        _X=np.vstack([X,unlabeled_X])
+        _X = np.vstack([X, unlabeled_X])
 
-        self.X=_X
+        self.X = _X
 
         for i in range(self.max_iterations):
-
             self.clusters = copy.copy(clusters)
 
-            self.unlabeled=[True]*len(_X)
+            self.unlabeled = [True] * len(_X)
 
-            self.is_clustered=np.array([-1]*len(_X))
+            self.is_clustered = np.array([-1] * len(_X))
 
             for _ in range(self.k):
                 s = self.clusters[_]
                 for idx in s:
-                    self.is_clustered[idx]=_
-                    self.unlabeled[idx]=False
+                    self.is_clustered[idx] = _
+                    self.unlabeled[idx] = False
 
-            unlabeled_idx=np.arange(len(_X))
-            self.unlabeled_set=unlabeled_idx[self.unlabeled]
+            unlabeled_idx = np.arange(len(_X))
+            self.unlabeled_set = unlabeled_idx[self.unlabeled]
 
             for x_index in self.unlabeled_set:
-
                 distances = np.array([np.linalg.norm(_X[x_index] - c[centroid]) for centroid in range(len(c))])
-                r=np.argmin(distances).item()
+                r = np.argmin(distances).item()
 
                 self.clusters[r].add(x_index)
-                self.is_clustered[x_index]=r
+                self.is_clustered[x_index] = r
 
             previous = c
 
@@ -106,42 +111,44 @@ class Constrained_Seed_k_means(TransductiveEstimator, ClusterMixin):
         else:
             result = np.array([])
             for _ in range(len(X)):
-                distances = np.array([np.linalg.norm(X[_] - self.center[centroid]) for centroid in range(len(self.center))])
+                distances = np.array(
+                    [np.linalg.norm(X[_] - self.center[centroid]) for centroid in range(len(self.center))]
+                )
                 result = np.hstack([result, np.argmin(distances)])
         return result
 
-    def evaluate(self, X=None, y=None,Transductive=True):
+    def evaluate(self, X=None, y=None, Transductive=True):
         if isinstance(X, Dataset) and y is None:
-            y= getattr(X, 'y')
+            y = getattr(X, "y")
 
-        self.y_pred=self.predict(X,Transductive=Transductive)
+        self.y_pred = self.predict(X, Transductive=Transductive)
 
         if Transductive:
-            X=self.X
+            X = self.X
 
         if self.evaluation is None:
             return None
 
-        elif isinstance(self.evaluation,(list,tuple)):
-            performance=[]
+        elif isinstance(self.evaluation, (list, tuple)):
+            performance = []
             for eval in self.evaluation:
-                score=eval.scoring(y,self.y_pred,X)
+                score = eval.scoring(y, self.y_pred, X)
                 if self.verbose:
                     print(score, file=self.file)
                 performance.append(score)
             self.performance = performance
             return performance
-        elif isinstance(self.evaluation,dict):
-            performance={}
-            for key,val in self.evaluation.items():
-                performance[key]=val.scoring(y,self.y_pred,X)
+        elif isinstance(self.evaluation, dict):
+            performance = {}
+            for key, val in self.evaluation.items():
+                performance[key] = val.scoring(y, self.y_pred, X)
                 if self.verbose:
-                    print(key,' ',performance[key],file=self.file)
+                    print(key, " ", performance[key], file=self.file)
                 self.performance = performance
             return performance
         else:
-            performance=self.evaluation.scoring(y,self.y_pred,X)
+            performance = self.evaluation.scoring(y, self.y_pred, X)
             if self.verbose:
                 print(performance, file=self.file)
-            self.performance=performance
+            self.performance = performance
             return performance

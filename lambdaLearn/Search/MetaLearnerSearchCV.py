@@ -1,6 +1,5 @@
 import time
 from collections import defaultdict
-from collections.abc import Mapping
 from itertools import product
 
 import numpy as np
@@ -8,11 +7,10 @@ from joblib import Parallel
 from sklearn.base import clone, is_classifier
 from sklearn.metrics import check_scoring
 from sklearn.metrics._scorer import _check_multimetric_scoring
-from sklearn.model_selection._search import BaseSearchCV, ParameterGrid, ParameterSampler
+from sklearn.model_selection._search import BaseSearchCV, ParameterSampler
 from sklearn.model_selection._split import check_cv
 from sklearn.model_selection._validation import _fit_and_score, _insert_error_scores, _warn_about_fit_failures
 from sklearn.svm import SVR
-from sklearn.utils import check_random_state
 from sklearn.utils.fixes import delayed
 from sklearn.utils.validation import _check_fit_params, indexable
 
@@ -62,20 +60,16 @@ class MetaLearnerSearchCV(BaseSearchCV):
             error_score=error_score,
             return_train_score=return_train_score,
         )
-        self.lam=lam
-        self.warm_up=warm_up
+        self.lam = lam
+        self.warm_up = warm_up
         self.param_distributions = param_distributions
         self.n_iter = n_iter
         self.random_state = random_state
-        self.meta_learner=meta_learner
+        self.meta_learner = meta_learner
 
     def _run_search(self, evaluate_candidates):
         """Search n_iter candidates from param_distributions"""
-        evaluate_candidates(
-            ParameterSampler(
-                self.param_distributions, self.warm_up, random_state=self.random_state
-            )
-        )
+        evaluate_candidates(ParameterSampler(self.param_distributions, self.warm_up, random_state=self.random_state))
 
     def fit(self, X, y=None, *, groups=None, **fit_params):
         estimator = self.estimator
@@ -123,8 +117,7 @@ class MetaLearnerSearchCV(BaseSearchCV):
 
             if self.verbose > 0:
                 print(
-                    "Fitting {0} folds for each of {1} candidates,"
-                    " totalling {2} fits".format(
+                    "Fitting {0} folds for each of {1} candidates," " totalling {2} fits".format(
                         n_splits, n_candidates, n_candidates * n_splits
                     )
                 )
@@ -147,11 +140,7 @@ class MetaLearnerSearchCV(BaseSearchCV):
             )
 
             if len(out) < 1:
-                raise ValueError(
-                    "No fits were performed. "
-                    "Was the CV iterator empty? "
-                    "Were there no candidates?"
-                )
+                raise ValueError("No fits were performed. " "Was the CV iterator empty? " "Were there no candidates?")
             elif len(out) != n_candidates * n_splits:
                 raise ValueError(
                     "cv.split and cv.get_n_splits returned "
@@ -176,9 +165,7 @@ class MetaLearnerSearchCV(BaseSearchCV):
                     all_more_results[key].extend(value)
 
             nonlocal results
-            results = self._format_results(
-                all_candidate_params, n_splits, all_out, all_more_results
-            )
+            results = self._format_results(all_candidate_params, n_splits, all_out, all_more_results)
             return results
 
         with parallel:
@@ -190,31 +177,31 @@ class MetaLearnerSearchCV(BaseSearchCV):
         if callable(self.scoring) and self.multimetric_:
             self._check_refit_for_multimetric(first_test_score)
             refit_metric = self.refit
-        params = results['params']
+        params = results["params"]
         score = results[f"mean_test_{refit_metric}"]
-        _X=[]
+        _X = []
         for _ in range(self.warm_up):
             _X.append(list(params[_].values()))
-        _X=np.array(_X)
-        _y=score
+        _X = np.array(_X)
+        _y = score
         for _ in range(self.n_iter):
             self.meta_learner.fit(_X, _y)
-            condidate_params=list(ParameterSampler(
-                self.param_distributions, self.lam, random_state=self.random_state
-            ))
-            _test_X=[]
+            condidate_params = list(
+                ParameterSampler(self.param_distributions, self.lam, random_state=self.random_state)
+            )
+            _test_X = []
             for _ in range(self.lam):
                 _test_X.append(list(condidate_params[_].values()))
-            _test_X=np.array(_test_X)
-            _pred_y=self.meta_learner.predict(_test_X)
-            idx=_pred_y.argmax()
-            _params=dict()
-            key_idx=0
+            _test_X = np.array(_test_X)
+            _pred_y = self.meta_learner.predict(_test_X)
+            idx = _pred_y.argmax()
+            _params = dict()
+            key_idx = 0
             for key in list(self.param_distributions.keys()):
-                _params[key]=_test_X[idx][key_idx]
+                _params[key] = _test_X[idx][key_idx]
             evaluate_candidates([_params])
-            _X = np.concatenate((_X, np.expand_dims(_test_X[idx],axis=0)), axis=0)
-            _y= np.concatenate((_y,np.array([_pred_y[idx]])),axis=0)
+            _X = np.concatenate((_X, np.expand_dims(_test_X[idx], axis=0)), axis=0)
+            _y = np.concatenate((_y, np.array([_pred_y[idx]])), axis=0)
 
         first_test_score = all_out[0]["test_scores"]
         self.multimetric_ = isinstance(first_test_score, dict)
@@ -223,22 +210,16 @@ class MetaLearnerSearchCV(BaseSearchCV):
             self._check_refit_for_multimetric(first_test_score)
             refit_metric = self.refit
 
-        self.best_index_ = self._select_best_index(
-            self.refit, refit_metric, results
-        )
+        self.best_index_ = self._select_best_index(self.refit, refit_metric, results)
         # With a non-custom callable, we can select the best score
         # based on the best index
-        self.best_score_ = results[f"mean_test_{refit_metric}"][
-            self.best_index_
-        ]
+        self.best_score_ = results[f"mean_test_{refit_metric}"][self.best_index_]
         self.best_params_ = results["params"][self.best_index_]
 
         if self.refit:
             # we clone again after setting params in case some
             # of the params are estimators as well.
-            self.best_estimator_ = clone(
-                clone(base_estimator).set_params(**self.best_params_)
-            )
+            self.best_estimator_ = clone(clone(base_estimator).set_params(**self.best_params_))
             refit_start_time = time.time()
             if y is not None:
                 self.best_estimator_.fit(X, y, **fit_params)

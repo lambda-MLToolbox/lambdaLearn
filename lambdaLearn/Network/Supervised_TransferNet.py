@@ -53,8 +53,7 @@ class AlexNetBackbone(nn.Module):
         self.features = model_alexnet.features
         self.classifier = nn.Sequential()
         for i in range(6):
-            self.classifier.add_module(
-                "classifier" + str(i), model_alexnet.classifier[i])
+            self.classifier.add_module("classifier" + str(i), model_alexnet.classifier[i])
         self._feature_dim = model_alexnet.classifier[6].in_features
 
     def forward(self, x):
@@ -109,7 +108,7 @@ class LambdaSheduler(nn.Module):
 
     def lamb(self):
         p = self.curr_iter / self.max_iter
-        lamb = 2. / (1. + np.exp(-self.gamma * p)) - 1
+        lamb = 2.0 / (1.0 + np.exp(-self.gamma * p)) - 1
         return lamb
 
     def step(self):
@@ -117,9 +116,9 @@ class LambdaSheduler(nn.Module):
 
 
 class AdversarialLoss(nn.Module):
-    '''
+    """
     Acknowledgement: The adversarial loss implementation is inspired by http://transfer.thuml.ai/
-    '''
+    """
 
     def __init__(self, gamma=1.0, max_iter=1000, use_lambda_scheduler=True, **kwargs):
         super(AdversarialLoss, self).__init__()
@@ -176,15 +175,16 @@ class Discriminator(nn.Module):
             nn.BatchNorm1d(hidden_dim),
             nn.ReLU(),
             nn.Linear(hidden_dim, 1),
-            nn.Sigmoid()
+            nn.Sigmoid(),
         ]
         self.layers = torch.nn.Sequential(*layers)
 
     def forward(self, x):
         return self.layers(x)
 
+
 class MMDLoss(nn.Module):
-    def __init__(self, kernel_type='rbf', kernel_mul=2.0, kernel_num=5, fix_sigma=None, **kwargs):
+    def __init__(self, kernel_type="rbf", kernel_mul=2.0, kernel_num=5, fix_sigma=None, **kwargs):
         super(MMDLoss, self).__init__()
         self.kernel_num = kernel_num
         self.kernel_mul = kernel_mul
@@ -194,20 +194,16 @@ class MMDLoss(nn.Module):
     def guassian_kernel(self, source, target, kernel_mul, kernel_num, fix_sigma):
         n_samples = int(source.size()[0]) + int(target.size()[0])
         total = torch.cat([source, target], dim=0)
-        total0 = total.unsqueeze(0).expand(
-            int(total.size(0)), int(total.size(0)), int(total.size(1)))
-        total1 = total.unsqueeze(1).expand(
-            int(total.size(0)), int(total.size(0)), int(total.size(1)))
-        L2_distance = ((total0-total1)**2).sum(2)
+        total0 = total.unsqueeze(0).expand(int(total.size(0)), int(total.size(0)), int(total.size(1)))
+        total1 = total.unsqueeze(1).expand(int(total.size(0)), int(total.size(0)), int(total.size(1)))
+        L2_distance = ((total0 - total1) ** 2).sum(2)
         if fix_sigma:
             bandwidth = fix_sigma
         else:
-            bandwidth = torch.sum(L2_distance.data) / (n_samples**2-n_samples)
+            bandwidth = torch.sum(L2_distance.data) / (n_samples**2 - n_samples)
         bandwidth /= kernel_mul ** (kernel_num // 2)
-        bandwidth_list = [bandwidth * (kernel_mul**i)
-                          for i in range(kernel_num)]
-        kernel_val = [torch.exp(-L2_distance / bandwidth_temp)
-                      for bandwidth_temp in bandwidth_list]
+        bandwidth_list = [bandwidth * (kernel_mul**i) for i in range(kernel_num)]
+        kernel_val = [torch.exp(-L2_distance / bandwidth_temp) for bandwidth_temp in bandwidth_list]
         return sum(kernel_val)
 
     def linear_mmd2(self, f_of_X, f_of_Y):
@@ -217,18 +213,24 @@ class MMDLoss(nn.Module):
         return loss
 
     def forward(self, source, target):
-        if self.kernel_type == 'linear':
+        if self.kernel_type == "linear":
             return self.linear_mmd2(source, target)
-        elif self.kernel_type == 'rbf':
+        elif self.kernel_type == "rbf":
             batch_size = int(source.size()[0])
             kernels = self.guassian_kernel(
-                source, target, kernel_mul=self.kernel_mul, kernel_num=self.kernel_num, fix_sigma=self.fix_sigma)
+                source,
+                target,
+                kernel_mul=self.kernel_mul,
+                kernel_num=self.kernel_num,
+                fix_sigma=self.fix_sigma,
+            )
             XX = torch.mean(kernels[:batch_size, :batch_size])
             YY = torch.mean(kernels[batch_size:, batch_size:])
             XY = torch.mean(kernels[:batch_size, batch_size:])
             YX = torch.mean(kernels[batch_size:, :batch_size])
             loss = torch.mean(XX + YY - XY - YX)
             return loss
+
 
 class DAANLoss(AdversarialLoss, LambdaSheduler):
     def __init__(self, num_classes, gamma=1.0, max_iter=1000, **kwargs):
@@ -285,29 +287,42 @@ class DAANLoss(AdversarialLoss, LambdaSheduler):
 
 
 class LMMDLoss(MMDLoss, LambdaSheduler):
-    def __init__(self, num_classes, kernel_type='rbf', kernel_mul=2.0, kernel_num=5, fix_sigma=None,
-                 gamma=1.0, max_iter=1000, **kwargs):
-        '''
+    def __init__(
+        self,
+        num_classes,
+        kernel_type="rbf",
+        kernel_mul=2.0,
+        kernel_num=5,
+        fix_sigma=None,
+        gamma=1.0,
+        max_iter=1000,
+        **kwargs,
+    ):
+        """
         Local MMD
-        '''
+        """
         super(LMMDLoss, self).__init__(kernel_type, kernel_mul, kernel_num, fix_sigma, **kwargs)
         super(MMDLoss, self).__init__(gamma, max_iter, **kwargs)
         self.num_classes = num_classes
 
     def forward(self, source, target, source_label, target_logits):
-        if self.kernel_type == 'linear':
+        if self.kernel_type == "linear":
             raise NotImplementedError("Linear kernel is not supported yet.")
 
-        elif self.kernel_type == 'rbf':
+        elif self.kernel_type == "rbf":
             batch_size = source.size()[0]
             weight_ss, weight_tt, weight_st = self.cal_weight(source_label, target_logits)
             weight_ss = torch.from_numpy(weight_ss).cuda()  # B, B
             weight_tt = torch.from_numpy(weight_tt).cuda()
             weight_st = torch.from_numpy(weight_st).cuda()
 
-            kernels = self.guassian_kernel(source, target,
-                                           kernel_mul=self.kernel_mul, kernel_num=self.kernel_num,
-                                           fix_sigma=self.fix_sigma)
+            kernels = self.guassian_kernel(
+                source,
+                target,
+                kernel_mul=self.kernel_mul,
+                kernel_num=self.kernel_num,
+                fix_sigma=self.fix_sigma,
+            )
             loss = torch.Tensor([0]).cuda()
             if torch.sum(torch.isnan(sum(kernels))):
                 return loss
@@ -368,10 +383,15 @@ class LMMDLoss(MMDLoss, LambdaSheduler):
             weight_ss = np.array([0])
             weight_tt = np.array([0])
             weight_st = np.array([0])
-        return weight_ss.astype('float32'), weight_tt.astype('float32'), weight_st.astype('float32')
+        return (
+            weight_ss.astype("float32"),
+            weight_tt.astype("float32"),
+            weight_st.astype("float32"),
+        )
+
 
 def BNM(src, tar):
-    """ Batch nuclear-norm maximization, CVPR 2020.
+    """Batch nuclear-norm maximization, CVPR 2020.
     tar: a tensor, softmax target output.
     NOTE: this does not require source domain data.
     """
@@ -382,39 +402,40 @@ def BNM(src, tar):
 
 def kernel(ker, X1, X2, gamma):
     K = None
-    if ker == 'linear':
+    if ker == "linear":
         if X2 is not None:
             K = sklearn.metrics.pairwise.linear_kernel(np.asarray(X1), np.asarray(X2))
         else:
             K = sklearn.metrics.pairwise.linear_kernel(np.asarray(X1))
-    elif ker == 'rbf':
+    elif ker == "rbf":
         if X2 is not None:
             K = sklearn.metrics.pairwise.rbf_kernel(np.asarray(X1), np.asarray(X2), gamma)
         else:
             K = sklearn.metrics.pairwise.rbf_kernel(np.asarray(X1), None, gamma)
     return K
 
+
 class KMM:
-    def __init__(self, kernel_type='rbf', gamma=None, B=1.0, eps=None):
-        '''
+    def __init__(self, kernel_type="rbf", gamma=None, B=1.0, eps=None):
+        """
         Initialization function
         :param kernel_type: 'linear' | 'rbf'
         :param gamma: kernel bandwidth for rbf kernel
         :param B: bound for beta
         :param eps: bound for sigma_beta
-        '''
+        """
         self.kernel_type = kernel_type
         self.gamma = gamma
         self.B = B
         self.eps = eps
 
     def fit(self, Xs, Xt):
-        '''
+        """
         Fit source and target using KMM (compute the coefficients)
         :param Xs: ns * dim
         :param Xt: nt * dim
         :return: Coefficients (Pt / Ps) value vector (Beta in the paper)
-        '''
+        """
         ns = Xs.shape[0]
         nt = Xt.shape[0]
         if self.eps == None:
@@ -425,26 +446,37 @@ class KMM:
         K = matrix(K.astype(np.double))
         kappa = matrix(kappa.astype(np.double))
         G = matrix(np.r_[np.ones((1, ns)), -np.ones((1, ns)), np.eye(ns), -np.eye(ns)])
-        h = matrix(np.r_[ns * (1 + self.eps), ns * (self.eps - 1), self.B * np.ones((ns,)), np.zeros((ns,))])
-        solvers.options['show_progress']=False
-        sol = solvers.qp(K, -kappa, G, h,show_progress=False)
-        beta = np.array(sol['x'])
+        h = matrix(
+            np.r_[
+                ns * (1 + self.eps),
+                ns * (self.eps - 1),
+                self.B * np.ones((ns,)),
+                np.zeros((ns,)),
+            ]
+        )
+        solvers.options["show_progress"] = False
+        sol = solvers.qp(K, -kappa, G, h, show_progress=False)
+        beta = np.array(sol["x"])
         # beta=np.max(beta,0)
         # print('Beta')
         # print(np.all(beta>0))
         for index in range(beta.shape[0]):
-            beta[index]=max(0,beta[index])
+            beta[index] = max(0, beta[index])
         beta = beta / beta.mean()
         return beta
 
 
 class Weight(nn.Module):
-    def __init__(self,device='cpu',**kwargs):
+    def __init__(self, device="cpu", **kwargs):
         super(Weight, self).__init__()
-        self.device=device
+        self.device = device
+
     def forward(self, source, target):
-        weight=torch.Tensor(KMM(kernel_type='linear').fit(to_numpy(source),to_numpy(target))).to(self.device).detach()
-        return MMDLoss()(source*weight,target)
+        weight = (
+            torch.Tensor(KMM(kernel_type="linear").fit(to_numpy(source), to_numpy(target))).to(self.device).detach()
+        )
+        return MMDLoss()(source * weight, target)
+
 
 def CORAL(source, target, **kwargs):
     d = source.data.shape[1]
@@ -459,9 +491,8 @@ def CORAL(source, target, **kwargs):
 
     # frobenius norm between source and target
     loss = torch.mul((xc - xct), (xc - xct))
-    loss = torch.sum(loss) / (4*d*d)
+    loss = torch.sum(loss) / (4 * d * d)
     return loss
-
 
 
 class TransferLoss(nn.Module):
@@ -481,7 +512,7 @@ class TransferLoss(nn.Module):
         elif loss_type == "bnm":
             self.loss_func = BNM
         elif loss_type == "weight":
-            self.loss_func=Weight(**kwargs)
+            self.loss_func = Weight(**kwargs)
         else:
             print("WARNING: No valid transfer loss function is used.")
             self.loss_func = lambda x, y: 0  # return 0
@@ -489,20 +520,31 @@ class TransferLoss(nn.Module):
     def forward(self, source, target, **kwargs):
         return self.loss_func(source, target, **kwargs)
 
+
 class Supervised_TransferNet(nn.Module):
-    def __init__(self, num_classes, base_net='resnet50', transfer_loss='mmd', use_bottleneck=True, bottleneck_width=256,
-                 max_iter=1000, device='cpu',weight=False,**kwargs):
+    def __init__(
+        self,
+        num_classes,
+        base_net="resnet50",
+        transfer_loss="mmd",
+        use_bottleneck=True,
+        bottleneck_width=256,
+        max_iter=1000,
+        device="cpu",
+        weight=False,
+        **kwargs,
+    ):
         super(Supervised_TransferNet, self).__init__()
         self.num_classes = num_classes
         self.base_network = get_backbone(base_net)
         self.use_bottleneck = use_bottleneck
         self.transfer_loss = transfer_loss
-        self.weight=weight
-        self.device=device
+        self.weight = weight
+        self.device = device
         if self.use_bottleneck:
             bottleneck_list = [
                 nn.Linear(self.base_network.output_num(), bottleneck_width),
-                nn.ReLU()
+                nn.ReLU(),
             ]
             self.bottleneck_layer = nn.Sequential(*bottleneck_list)
             feature_dim = bottleneck_width
@@ -514,14 +556,15 @@ class Supervised_TransferNet(nn.Module):
             "loss_type": self.transfer_loss,
             "max_iter": max_iter,
             "num_classes": num_classes,
-            "device": self.device
+            "device": self.device,
         }
         self.adapt_loss = TransferLoss(**transfer_loss_args)
         if self.weight:
-            self.criterion = torch.nn.CrossEntropyLoss(reduction='none')
+            self.criterion = torch.nn.CrossEntropyLoss(reduction="none")
         else:
-            self.criterion=torch.nn.CrossEntropyLoss()
-    def forward(self, source, target, source_label,target_label):
+            self.criterion = torch.nn.CrossEntropyLoss()
+
+    def forward(self, source, target, source_label, target_label):
         source = self.base_network(source)
         target = self.base_network(target)
         if self.use_bottleneck:
@@ -534,8 +577,10 @@ class Supervised_TransferNet(nn.Module):
         # print(source_clf.shape)
         # print(source_label.shape)
         if self.weight:
-            weight = torch.Tensor(KMM(kernel_type='linear').fit(to_numpy(source), to_numpy(target))).to(self.device).detach()
-            clf_loss_1 = (self.criterion(source_clf, source_label.long())*weight).mean()
+            weight = (
+                torch.Tensor(KMM(kernel_type="linear").fit(to_numpy(source), to_numpy(target))).to(self.device).detach()
+            )
+            clf_loss_1 = (self.criterion(source_clf, source_label.long()) * weight).mean()
         else:
             clf_loss_1 = self.criterion(source_clf, source_label.long())
         # classification
@@ -545,19 +590,19 @@ class Supervised_TransferNet(nn.Module):
         # print(target_label.shape)
         clf_loss_2 = torch.nn.CrossEntropyLoss()(target_clf, target_label.long())
         # transfer
-        clf_loss=clf_loss_2+clf_loss_1
+        clf_loss = clf_loss_2 + clf_loss_1
         # clf_loss=clf_loss_1
         kwargs = {}
         if self.transfer_loss == "lmmd":
-            kwargs['source_label'] = source_label
+            kwargs["source_label"] = source_label
             target_clf = self.classifier_layer(target)
-            kwargs['target_logits'] = torch.nn.functional.softmax(target_clf, dim=1)
+            kwargs["target_logits"] = torch.nn.functional.softmax(target_clf, dim=1)
         elif self.transfer_loss == "daan":
             source_clf = self.classifier_layer(source)
-            kwargs['source_logits'] = torch.nn.functional.softmax(source_clf, dim=1)
+            kwargs["source_logits"] = torch.nn.functional.softmax(source_clf, dim=1)
             target_clf = self.classifier_layer(target)
-            kwargs['target_logits'] = torch.nn.functional.softmax(target_clf, dim=1)
-        elif self.transfer_loss == 'bnm':
+            kwargs["target_logits"] = torch.nn.functional.softmax(target_clf, dim=1)
+        elif self.transfer_loss == "bnm":
             tar_clf = self.classifier_layer(target)
             target = nn.Softmax(dim=1)(tar_clf)
 
@@ -566,24 +611,31 @@ class Supervised_TransferNet(nn.Module):
 
     def get_parameters(self, initial_lr=1.0):
         params = [
-            {'params': self.base_network.parameters(), 'lr': 0.1 * initial_lr},
-            {'params': self.classifier_layer.parameters(), 'lr': 1.0 * initial_lr},
+            {"params": self.base_network.parameters(), "lr": 0.1 * initial_lr},
+            {"params": self.classifier_layer.parameters(), "lr": 1.0 * initial_lr},
         ]
         if self.use_bottleneck:
-            params.append(
-                {'params': self.bottleneck_layer.parameters(), 'lr': 1.0 * initial_lr}
-            )
+            params.append({"params": self.bottleneck_layer.parameters(), "lr": 1.0 * initial_lr})
         # Loss-dependent
         if self.transfer_loss == "adv":
             params.append(
-                {'params': self.adapt_loss.loss_func.domain_classifier.parameters(), 'lr': 1.0 * initial_lr}
+                {
+                    "params": self.adapt_loss.loss_func.domain_classifier.parameters(),
+                    "lr": 1.0 * initial_lr,
+                }
             )
         elif self.transfer_loss == "daan":
             params.append(
-                {'params': self.adapt_loss.loss_func.domain_classifier.parameters(), 'lr': 1.0 * initial_lr}
+                {
+                    "params": self.adapt_loss.loss_func.domain_classifier.parameters(),
+                    "lr": 1.0 * initial_lr,
+                }
             )
             params.append(
-                {'params': self.adapt_loss.loss_func.local_classifiers.parameters(), 'lr': 1.0 * initial_lr}
+                {
+                    "params": self.adapt_loss.loss_func.local_classifiers.parameters(),
+                    "lr": 1.0 * initial_lr,
+                }
             )
         return params
 

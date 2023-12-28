@@ -1,29 +1,28 @@
-import copy
-
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from torch.nn import ModuleList
-from torch.nn.parameter import Parameter
 from torchvision import models
 
 
-def to_var(x, requires_grad=True,device='cuda:0'):
+def to_var(x, requires_grad=True, device="cuda:0"):
     if torch.cuda.is_available():
         x = x.to(device)
     return Variable(x, requires_grad=requires_grad)
+
 
 class ResNet50Fc(nn.Module):
     """
     ** input image should be in range of [0, 1]**
     """
+
     def __init__(self, num_classes, bias=True, output_feature=False):
         super(ResNet50Fc, self).__init__()
         _model_resnet = models.resnet50(pretrained=True)
         model_resnet = _model_resnet
         self.conv1 = model_resnet.conv1
         self.bn_source = model_resnet.bn1
-        self.num_classes=num_classes
+        self.num_classes = num_classes
         # self.bn_target = copy.deepcopy(self.bn_source)
         self.relu = model_resnet.relu
         self.maxpool = model_resnet.maxpool
@@ -33,21 +32,21 @@ class ResNet50Fc(nn.Module):
         self.layer4 = model_resnet.layer4
         self.avgpool = model_resnet.avgpool
         __in_features = model_resnet.fc.in_features
-        self.output_feature=output_feature
+        self.output_feature = output_feature
         self.bottleneck = nn.Linear(__in_features, 256)
-        self.bias=bias
+        self.bias = bias
         self.relu_bottle = nn.ReLU()
-        if isinstance(self.num_classes,(list,tuple)):
-            self.fc=ModuleList([])
+        if isinstance(self.num_classes, (list, tuple)):
+            self.fc = ModuleList([])
             for i in range(len(self.num_classes)):
-                self.fc.append(nn.Linear(256, self.num_classes[i],bias=self.bias[i]))
+                self.fc.append(nn.Linear(256, self.num_classes[i], bias=self.bias[i]))
         else:
-            self.fc = nn.Linear(256, self.num_classes,bias=self.bias)
-        #self.fc = nn.Linear(256, num_classes)
+            self.fc = nn.Linear(256, self.num_classes, bias=self.bias)
+        # self.fc = nn.Linear(256, num_classes)
 
-    def forward(self, x,source=False):
+    def forward(self, x, source=False):
         x = self.conv1(x)
-        #if source:
+        # if source:
         x = self.bn_source(x)
         # else:
         # x = self.bn_target(x)
@@ -60,7 +59,7 @@ class ResNet50Fc(nn.Module):
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
         x = self.bottleneck(x)
-        x= self.relu_bottle(x)
+        x = self.relu_bottle(x)
         if isinstance(self.fc, ModuleList):
             output = []
             for c in self.fc:
@@ -92,7 +91,14 @@ class ResNet50Fc(nn.Module):
     #                 print(curr_mod)
     #             setattr(curr_mod, name, param)
 
-    def update_params(self, lr_inner, first_order=False, source_params=None, detach=False,device='cuda:0'):
+    def update_params(
+        self,
+        lr_inner,
+        first_order=False,
+        source_params=None,
+        detach=False,
+        device="cuda:0",
+    ):
         # for tgt in self.named_parameters():
         #     name_t, param_t = tgt
         #     self.rigister(self, name_t, param_t,device)
@@ -101,27 +107,26 @@ class ResNet50Fc(nn.Module):
                 name_t, param_t = tgt
                 grad = src
                 if first_order:
-                    grad = to_var(grad.detach().data,device=device)
+                    grad = to_var(grad.detach().data, device=device)
                 tmp = param_t - lr_inner * grad
-                self.set_param(self, name_t, tmp,grad,device=device)
+                self.set_param(self, name_t, tmp, grad, device=device)
         else:
-
             for name, param in self.named_parameters():
                 if not detach:
                     grad = param.grad
                     if first_order:
-                        grad = to_var(grad.detach().data,device=device)
+                        grad = to_var(grad.detach().data, device=device)
                     tmp = param - lr_inner * grad
-                    self.set_param(self, name, tmp,device=device)
+                    self.set_param(self, name, tmp, device=device)
                 else:
                     param = param.detach_()
-                    self.set_param(self, name, param,device=device)
+                    self.set_param(self, name, param, device=device)
 
-    def set_param(self, curr_mod, name, param,grad=None,device='cuda:0'):
-        if '.' in name:
-            n = name.split('.')
+    def set_param(self, curr_mod, name, param, grad=None, device="cuda:0"):
+        if "." in name:
+            n = name.split(".")
             module_name = n[0]
-            rest = '.'.join(n[1:])
+            rest = ".".join(n[1:])
             for name, mod in curr_mod.named_children():
                 if module_name == name:
                     self.set_param(mod, rest, param)

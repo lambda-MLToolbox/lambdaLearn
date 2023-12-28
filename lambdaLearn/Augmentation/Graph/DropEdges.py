@@ -22,14 +22,14 @@ class DropEdges(Transformer):
             permutation = rng.permutation(num_edges)
         else:
             permutation = np.arange(num_edges)
-        ind_drop_edge = permutation[:self.num_drop].tolist()
-        ind_save_edge= permutation[self.num_drop: num_edges].tolist()
+        ind_drop_edge = permutation[: self.num_drop].tolist()
+        ind_save_edge = permutation[self.num_drop : num_edges].tolist()
 
-        if hasattr(X, 'edge_index')and X.edge_index is not None:
-            X.edge_index = X.edge_index[:,ind_save_edge]
-        if hasattr(X, 'edge_weight')and X.edge_weight is not None:
+        if hasattr(X, "edge_index") and X.edge_index is not None:
+            X.edge_index = X.edge_index[:, ind_save_edge]
+        if hasattr(X, "edge_weight") and X.edge_weight is not None:
             X.edge_weight = X.edge_weight[ind_save_edge]
-        if hasattr(X, 'edge_attr')and X.edge_attr is not None:
+        if hasattr(X, "edge_attr") and X.edge_attr is not None:
             X.edge_attr = X.edge_attr[ind_save_edge]
         X.num_edges = len(ind_save_edge)
 

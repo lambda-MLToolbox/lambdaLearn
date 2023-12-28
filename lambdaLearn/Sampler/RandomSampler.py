@@ -4,19 +4,23 @@ from lambdaLearn.Base.BaseSampler import BaseSampler
 
 
 class RandomSampler(BaseSampler):
-    def __init__(self,replacement: bool = False,
-                 num_samples = None, generator=None):
+    def __init__(self, replacement: bool = False, num_samples=None, generator=None):
         # >> Parameter:
         # >> - replacement: samples are drawn on-demand with replacement if True.
         # >> - num_samples: The number of samples
         # >> - generator: Generator used in sampling.
 
         super().__init__()
-        self.replacement=replacement
-        self.num_samples=num_samples
-        self.generator=generator
-    def init_sampler(self,data_source):
+        self.replacement = replacement
+        self.num_samples = num_samples
+        self.generator = generator
+
+    def init_sampler(self, data_source):
         # >> init_sampler(data_source):  Initialize the sampler with data.
         # >> - data_source: The data to be sampled.
-        return sampler.RandomSampler(data_source=data_source,replacement=self.replacement,
-                                     num_samples=self.num_samples,generator=self.generator)
+        return sampler.RandomSampler(
+            data_source=data_source,
+            replacement=self.replacement,
+            num_samples=self.num_samples,
+            generator=self.generator,
+        )

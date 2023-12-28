@@ -22,15 +22,15 @@ class SDNE(torch.nn.Module):
 
         layers = []
         for layer_dim in reversed(hidden_layers[:-1]):
-            layers.append(torch.nn.Linear(dim_in , layer_dim))
+            layers.append(torch.nn.Linear(dim_in, layer_dim))
             layers.append(torch.nn.ReLU())
-            dim_in  = layer_dim
+            dim_in = layer_dim
 
-        layers.append(torch.nn.Linear(dim_in , dim_in_copy))
+        layers.append(torch.nn.Linear(dim_in, dim_in_copy))
         layers.append(torch.nn.ReLU())
         self.decoder = torch.nn.Sequential(*layers)
 
-    def forward(self,X=None):
+    def forward(self, X=None):
         Y = self.encoder(X)
         X_hat = self.decoder(Y)
-        return Y,X_hat
+        return Y, X_hat

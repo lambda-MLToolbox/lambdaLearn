@@ -8,15 +8,14 @@ from torch.nn.parameter import Parameter
 
 
 class Encoder(torch.nn.Module):
-    def __init__(self, dim_in, dim_out, activation,
-                 train_bn_scaling, noise_level,device='cpu'):
+    def __init__(self, dim_in, dim_out, activation, train_bn_scaling, noise_level, device="cpu"):
         super(Encoder, self).__init__()
-        self.dim_in=dim_in
+        self.dim_in = dim_in
         self.dim_out = dim_out
         self.activation = activation
         self.train_bn_scaling = train_bn_scaling
         self.noise_level = noise_level
-        self.device=device
+        self.device = device
 
         # Encoder
         # Encoder only uses W matrix, no bias
@@ -44,7 +43,6 @@ class Encoder(torch.nn.Module):
         self.buffer_tilde_z = None
 
     def bn_gamma_beta(self, x):
-
         ones = Parameter(torch.ones(x.size()[0], 1).to(self.device))
         t = x + ones.mm(self.bn_beta)
         if self.train_bn_scaling:
@@ -59,7 +57,7 @@ class Encoder(torch.nn.Module):
         self.buffer_z = z.detach().clone()
         z_gb = self.bn_gamma_beta(z)
         if self.activation is None:
-            h=z_gb
+            h = z_gb
         else:
             h = self.activation(z_gb)
         return h
@@ -78,38 +76,45 @@ class Encoder(torch.nn.Module):
         self.buffer_tilde_z = tilde_z
         z = self.bn_gamma_beta(tilde_z)
         if self.activation is None:
-            h=z
+            h = z
         else:
             h = self.activation(z)
         return h
 
 
 class StackedEncoders(torch.nn.Module):
-    def __init__(self, dim_in, num_classes,dim_encoders, activation_types,
-                 noise_std,device='cpu'):
+    def __init__(
+        self,
+        dim_in,
+        num_classes,
+        dim_encoders,
+        activation_types,
+        noise_std,
+        device="cpu",
+    ):
         super(StackedEncoders, self).__init__()
         self.buffer_tilde_z_bottom = None
         self.encoders_ref = []
         self.encoders = torch.nn.Sequential()
         self.noise_level = noise_std
-        n_encoders = len(dim_encoders)+1
-        self.device=device
+        n_encoders = len(dim_encoders) + 1
+        self.device = device
         for i in range(n_encoders):
             if i == 0:
                 dim_input = dim_in
             else:
                 dim_input = dim_encoders[i - 1]
-            if i==n_encoders-1:
-                dim_output=num_classes
+            if i == n_encoders - 1:
+                dim_output = num_classes
                 activation = None
-                train_batch_norm=True
+                train_batch_norm = True
             else:
                 dim_output = dim_encoders[i]
                 activation = activation_types[i]
-                train_batch_norm=False
+                train_batch_norm = False
 
             encoder_ref = "encoder_" + str(i)
-            encoder = Encoder(dim_input, dim_output, activation, train_batch_norm, noise_std,device)
+            encoder = Encoder(dim_input, dim_output, activation, train_batch_norm, noise_std, device)
             self.encoders_ref.append(encoder_ref)
             self.encoders.add_module(encoder_ref, encoder)
 
@@ -162,27 +167,26 @@ class StackedEncoders(torch.nn.Module):
             z_layers.reverse()
         return z_layers
 
+
 class Decoder(torch.nn.Module):
-    def __init__(self, dim_in, dim_out,device='cpu'):
+    def __init__(self, dim_in, dim_out, device="cpu"):
         super(Decoder, self).__init__()
 
         self.dim_in = dim_in
         self.dim_out = dim_out
         self.device = device
 
+        self.a1 = Parameter(0.0 * torch.ones(1, dim_in).to(self.device))
+        self.a2 = Parameter(1.0 * torch.ones(1, dim_in).to(self.device))
+        self.a3 = Parameter(0.0 * torch.ones(1, dim_in).to(self.device))
+        self.a4 = Parameter(0.0 * torch.ones(1, dim_in).to(self.device))
+        self.a5 = Parameter(0.0 * torch.ones(1, dim_in).to(self.device))
 
-        self.a1 = Parameter(0. * torch.ones(1, dim_in).to(self.device))
-        self.a2 = Parameter(1. * torch.ones(1, dim_in).to(self.device))
-        self.a3 = Parameter(0. * torch.ones(1, dim_in).to(self.device))
-        self.a4 = Parameter(0. * torch.ones(1, dim_in).to(self.device))
-        self.a5 = Parameter(0. * torch.ones(1, dim_in).to(self.device))
-
-        self.a6 = Parameter(0. * torch.ones(1, dim_in).to(self.device))
-        self.a7 = Parameter(1. * torch.ones(1, dim_in).to(self.device))
-        self.a8 = Parameter(0. * torch.ones(1, dim_in).to(self.device))
-        self.a9 = Parameter(0. * torch.ones(1, dim_in).to(self.device))
-        self.a10 = Parameter(0. * torch.ones(1, dim_in).to(self.device))
-
+        self.a6 = Parameter(0.0 * torch.ones(1, dim_in).to(self.device))
+        self.a7 = Parameter(1.0 * torch.ones(1, dim_in).to(self.device))
+        self.a8 = Parameter(0.0 * torch.ones(1, dim_in).to(self.device))
+        self.a9 = Parameter(0.0 * torch.ones(1, dim_in).to(self.device))
+        self.a10 = Parameter(0.0 * torch.ones(1, dim_in).to(self.device))
 
         if self.dim_out is not None:
             self.V = torch.nn.Linear(dim_in, dim_out, bias=False)
@@ -194,7 +198,6 @@ class Decoder(torch.nn.Module):
         self.buffer_hat_z_l = None
 
     def g(self, tilde_z_l, u_l):
-
         ones = Parameter(torch.ones(tilde_z_l.size()[0], 1).to(self.device))
 
         b_a1 = ones.mm(self.a1)
@@ -209,13 +212,9 @@ class Decoder(torch.nn.Module):
         b_a9 = ones.mm(self.a9)
         b_a10 = ones.mm(self.a10)
 
-        mu_l = torch.mul(b_a1, torch.sigmoid(torch.mul(b_a2, u_l) + b_a3)) + \
-               torch.mul(b_a4, u_l) + \
-               b_a5
+        mu_l = torch.mul(b_a1, torch.sigmoid(torch.mul(b_a2, u_l) + b_a3)) + torch.mul(b_a4, u_l) + b_a5
 
-        v_l = torch.mul(b_a6, torch.sigmoid(torch.mul(b_a7, u_l) + b_a8)) + \
-              torch.mul(b_a9, u_l) + \
-              b_a10
+        v_l = torch.mul(b_a6, torch.sigmoid(torch.mul(b_a7, u_l) + b_a8)) + torch.mul(b_a9, u_l) + b_a10
 
         hat_z_l = torch.mul(tilde_z_l - mu_l, v_l) + mu_l
 
@@ -236,28 +235,28 @@ class Decoder(torch.nn.Module):
 
 
 class StackedDecoders(torch.nn.Module):
-    def __init__(self, dim_in, num_classes,dim_decoders, device='cpu'):
+    def __init__(self, dim_in, num_classes, dim_decoders, device="cpu"):
         super(StackedDecoders, self).__init__()
         self.bn_u_top = torch.nn.BatchNorm1d(num_classes, affine=False)
         self.decoders_ref = []
         self.decoders = torch.nn.Sequential()
-        n_decoders = len(dim_decoders)+1
-        self.device=device
+        n_decoders = len(dim_decoders) + 1
+        self.device = device
         for i in range(n_decoders):
             if i == 0:
                 dim_input = num_classes
             else:
                 dim_input = dim_decoders[i - 1]
-            if i==n_decoders-1:
+            if i == n_decoders - 1:
                 dim_output = dim_in
             else:
                 dim_output = dim_decoders[i]
             decoder_ref = "decoder_" + str(i)
-            decoder = Decoder(dim_input, dim_output,device=self.device)
+            decoder = Decoder(dim_input, dim_output, device=self.device)
             self.decoders_ref.append(decoder_ref)
             self.decoders.add_module(decoder_ref, decoder)
 
-        self.bottom_decoder = Decoder(dim_in, None,device=self.device)
+        self.bottom_decoder = Decoder(dim_in, None, device=self.device)
 
     def forward(self, tilde_z_layers, u_top, tilde_z_bottom):
         # Note that tilde_z_layers should be in reversed order of encoders
@@ -278,20 +277,28 @@ class StackedDecoders(torch.nn.Module):
         assert len(hat_z_layers) == len(z_pre_layers)
         hat_z_layers_normalized = []
         for i, (hat_z, z_pre) in enumerate(zip(hat_z_layers, z_pre_layers)):
+            ones = Variable(torch.ones(z_pre.size()[0], 1).to(self.device))  # 10*1
+            mean = torch.mean(z_pre, 0).unsqueeze(0)  # 1*10
 
-            ones = Variable(torch.ones(z_pre.size()[0], 1).to(self.device)) # 10*1
-            mean = torch.mean(z_pre, 0).unsqueeze(0)# 1*10
-
-            noise_var = Variable(torch.FloatTensor(np.random.normal(loc=0.0, scale=1 - 1e-10, size=z_pre.size())).to(self.device))
-            var = torch.var(z_pre.data + noise_var,dim=0).reshape(1, z_pre.size()[1])
+            noise_var = Variable(
+                torch.FloatTensor(np.random.normal(loc=0.0, scale=1 - 1e-10, size=z_pre.size())).to(self.device)
+            )
+            var = torch.var(z_pre.data + noise_var, dim=0).reshape(1, z_pre.size()[1])
             hat_z_normalized = torch.div(hat_z - ones.mm(mean), ones.mm(torch.sqrt(var + 1e-10)))
             hat_z_layers_normalized.append(hat_z_normalized)
         return hat_z_layers_normalized
 
+
 class LadderNetwork(torch.nn.Module):
-    def __init__(self, dim_encoder=[1000, 500, 250, 250, 250],
-                 encoder_activations=[nn.ReLU(), nn.ReLU(), nn.ReLU(), nn.ReLU(), nn.ReLU()],
-                 noise_std=0.2,dim_in=28*28,num_classes=10,device='cpu'):
+    def __init__(
+        self,
+        dim_encoder=[1000, 500, 250, 250, 250],
+        encoder_activations=[nn.ReLU(), nn.ReLU(), nn.ReLU(), nn.ReLU(), nn.ReLU()],
+        noise_std=0.2,
+        dim_in=28 * 28,
+        num_classes=10,
+        device="cpu",
+    ):
         # >> Parameter
         # >> - encoder_sizes: The neural network of generator.
         # >> - encoder_activations: The activation functions of the encoder.
@@ -300,19 +307,18 @@ class LadderNetwork(torch.nn.Module):
         # >> - num_classes: The number of classes.
         # >> - device: The device to train the model.
         super(LadderNetwork, self).__init__()
-        if isinstance(dim_in,numbers.Number):
+        if isinstance(dim_in, numbers.Number):
             input_dim = dim_in
         else:
-            input_dim=1
+            input_dim = 1
             for item in dim_in:
-                input_dim=input_dim*item
+                input_dim = input_dim * item
         dim_decoder = list(reversed(dim_encoder))
         decoder_in = num_classes
         encoder_in = input_dim
         self.device = device
-        self.se = StackedEncoders(encoder_in, decoder_in, dim_encoder, encoder_activations,
-                                noise_std,device)
-        self.de = StackedDecoders(encoder_in, decoder_in, dim_decoder ,device)
+        self.se = StackedEncoders(encoder_in, decoder_in, dim_encoder, encoder_activations, noise_std, device)
+        self.de = StackedDecoders(encoder_in, decoder_in, dim_decoder, device)
         self.bn_image = torch.nn.BatchNorm1d(encoder_in, affine=False)
 
     def forward_encoders_clean(self, data):

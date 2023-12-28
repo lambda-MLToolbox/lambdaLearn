@@ -8,8 +8,13 @@ from lambdaLearn.utils import partial
 
 
 class Resize(Transformer):
-    def __init__(self,size, interpolation = InterpolationMode.BILINEAR,
-           max_size = None, antialias = None):
+    def __init__(
+        self,
+        size,
+        interpolation=InterpolationMode.BILINEAR,
+        max_size=None,
+        antialias=None,
+    ):
         # > - Parameter:
         # > - size: Desired output size. If size is a sequence like (h, w), the output size
         #           will be matched to this. If size is an int, the smaller edge of the image
@@ -24,10 +29,16 @@ class Resize(Transformer):
         #           to True for 'InterpolationMode.BILINEAR' only mode. This can help making the output
         #           for PIL images and tensors closer.
         super().__init__()
-        self.resize=partial(F.resize,size=size,interpolation=interpolation,max_size=max_size,antialias=antialias)
+        self.resize = partial(
+            F.resize,
+            size=size,
+            interpolation=interpolation,
+            max_size=max_size,
+            antialias=antialias,
+        )
 
-    def transform(self,X):
-        if isinstance(X,np.ndarray):
-            X=PIL.Image.fromarray(X)
+    def transform(self, X):
+        if isinstance(X, np.ndarray):
+            X = PIL.Image.fromarray(X)
         X = self.resize(X)
         return X

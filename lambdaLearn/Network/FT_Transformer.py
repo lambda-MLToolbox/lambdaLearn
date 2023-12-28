@@ -19,7 +19,7 @@ class Tokenizer(nn.Module):
         d_token: int,
         bias: bool,
     ) -> None:
-        #categories = None
+        # categories = None
         super().__init__()
         if categories is None:
             d_bias = d_numerical
@@ -28,10 +28,10 @@ class Tokenizer(nn.Module):
         else:
             d_bias = d_numerical + len(categories)
             category_offsets = torch.tensor([0] + categories[:-1]).cumsum(0)
-            self.register_buffer('category_offsets', category_offsets)
+            self.register_buffer("category_offsets", category_offsets)
             self.category_embeddings = nn.Embedding(sum(categories), d_token)
             nn_init.kaiming_uniform_(self.category_embeddings.weight, a=math.sqrt(5))
-            print(f'{self.category_embeddings.weight.shape}=')
+            print(f"{self.category_embeddings.weight.shape}=")
 
         # take [CLS] token into account
         self.weight = nn.Parameter(Tensor(d_numerical + 1, d_token))
@@ -43,16 +43,13 @@ class Tokenizer(nn.Module):
 
     @property
     def n_tokens(self) -> int:
-        return len(self.weight) + (
-            0 if self.category_offsets is None else len(self.category_offsets)
-        )
+        return len(self.weight) + (0 if self.category_offsets is None else len(self.category_offsets))
 
     def forward(self, x_num: Tensor, x_cat: ty.Optional[Tensor]) -> Tensor:
         x_some = x_num if x_cat is None else x_cat
         assert x_some is not None
         x_num = torch.cat(
-            [torch.ones(len(x_some), 1, device=x_some.device)]  # [CLS]
-            + ([] if x_num is None else [x_num]),
+            [torch.ones(len(x_some), 1, device=x_some.device)] + ([] if x_num is None else [x_num]),  # [CLS]
             dim=1,
         )
         x = self.weight[None] * x_num[:, :, None]
@@ -73,12 +70,10 @@ class Tokenizer(nn.Module):
 
 
 class MultiheadAttention(nn.Module):
-    def __init__(
-        self, d: int, n_heads: int, dropout: float, initialization: str
-    ) -> None:
+    def __init__(self, d: int, n_heads: int, dropout: float, initialization: str) -> None:
         if n_heads > 1:
             assert d % n_heads == 0
-        assert initialization in ['xavier', 'kaiming']
+        assert initialization in ["xavier", "kaiming"]
 
         super().__init__()
         self.W_q = nn.Linear(d, d)
@@ -89,7 +84,7 @@ class MultiheadAttention(nn.Module):
         self.dropout = nn.Dropout(dropout) if dropout else None
 
         for m in [self.W_q, self.W_k, self.W_v]:
-            if initialization == 'xavier' and (n_heads > 1 or m is not self.W_v):
+            if initialization == "xavier" and (n_heads > 1 or m is not self.W_v):
                 # gain is needed since W_qkv is represented with 3 separate layers
                 nn_init.xavier_uniform_(m.weight, gain=1 / math.sqrt(2))
             nn_init.zeros_(m.bias)
@@ -154,22 +149,22 @@ class FT_Transformer(nn.Module):
         num_layers=8,
         dim_token=192,
         num_heads=8,
-        d_ffn_factor= 4/3,
+        d_ffn_factor=4 / 3,
         attention_dropout=0.2,
         ffn_dropout=0.1,
         residual_dropout=0,
-        activation='reglu',
+        activation="reglu",
         prenormalization=True,
-        initialization='kaiming',
+        initialization="kaiming",
         # linformer
         kv_compression=True,
-        kv_compression_sharing='headwise',
+        kv_compression_sharing="headwise",
         #
         num_classes=1,
         regression=False,
         categorical_indicator=None,
         output_feature=False,
-        bias=True
+        bias=True,
     ) -> None:
         assert (kv_compression is None) ^ (kv_compression_sharing is not None)
         super().__init__()
@@ -178,23 +173,19 @@ class FT_Transformer(nn.Module):
 
         self.categorical_indicator = categorical_indicator
         self.regression = regression
-        self.output_feature=output_feature
-        self.bias=bias
-        self.num_classes=num_classes
+        self.output_feature = output_feature
+        self.bias = bias
+        self.num_classes = num_classes
 
         def make_kv_compression():
             assert kv_compression
-            compression = nn.Linear(
-                n_tokens, int(n_tokens * kv_compression), bias=False
-            )
-            if initialization == 'xavier':
+            compression = nn.Linear(n_tokens, int(n_tokens * kv_compression), bias=False)
+            if initialization == "xavier":
                 nn_init.xavier_uniform_(compression.weight)
             return compression
 
         self.shared_kv_compression = (
-            make_kv_compression()
-            if kv_compression and kv_compression_sharing == 'layerwise'
-            else None
+            make_kv_compression() if kv_compression and kv_compression_sharing == "layerwise" else None
         )
 
         def make_normalization():
@@ -205,24 +196,20 @@ class FT_Transformer(nn.Module):
         for layer_idx in range(num_layers):
             layer = nn.ModuleDict(
                 {
-                    'attention': MultiheadAttention(
-                        dim_token, num_heads, attention_dropout, initialization
-                    ),
-                    'linear0': nn.Linear(
-                        dim_token, d_hidden * (2 if activation.endswith('glu') else 1)
-                    ),
-                    'linear1': nn.Linear(d_hidden, dim_token),
-                    'norm1': make_normalization(),
+                    "attention": MultiheadAttention(dim_token, num_heads, attention_dropout, initialization),
+                    "linear0": nn.Linear(dim_token, d_hidden * (2 if activation.endswith("glu") else 1)),
+                    "linear1": nn.Linear(d_hidden, dim_token),
+                    "norm1": make_normalization(),
                 }
             )
             if not prenormalization or layer_idx:
-                layer['norm0'] = make_normalization()
+                layer["norm0"] = make_normalization()
             if kv_compression and self.shared_kv_compression is None:
-                layer['key_compression'] = make_kv_compression()
-                if kv_compression_sharing == 'headwise':
-                    layer['value_compression'] = make_kv_compression()
+                layer["key_compression"] = make_kv_compression()
+                if kv_compression_sharing == "headwise":
+                    layer["value_compression"] = make_kv_compression()
                 else:
-                    assert kv_compression_sharing == 'key-value'
+                    assert kv_compression_sharing == "key-value"
             self.layers.append(layer)
 
         def reglu(x: Tensor) -> Tensor:
@@ -234,52 +221,48 @@ class FT_Transformer(nn.Module):
             return a * F.gelu(b)
 
         def get_nonglu_activation_fn(name: str) -> ty.Callable[[Tensor], Tensor]:
-            return (
-                F.relu
-                if name == 'reglu'
-                else F.gelu
-                if name == 'geglu'
-                else get_activation_fn(name)
-            )
+            return F.relu if name == "reglu" else F.gelu if name == "geglu" else get_activation_fn(name)
+
         def get_activation_fn(name: str) -> ty.Callable[[Tensor], Tensor]:
             return (
                 reglu
-                if name == 'reglu'
+                if name == "reglu"
                 else geglu
-                if name == 'geglu'
+                if name == "geglu"
                 else torch.sigmoid
-                if name == 'sigmoid'
+                if name == "sigmoid"
                 else getattr(F, name)
             )
+
         self.activation = get_activation_fn(activation)
         self.last_activation = get_nonglu_activation_fn(activation)
         self.prenormalization = prenormalization
         self.last_normalization = make_normalization() if prenormalization else None
         self.ffn_dropout = ffn_dropout
         self.residual_dropout = residual_dropout
-        if isinstance(self.num_classes,(list,tuple)):
-            self.fc=ModuleList([])
+        if isinstance(self.num_classes, (list, tuple)):
+            self.fc = ModuleList([])
             for i in range(len(self.num_classes)):
-                self.fc.append(nn.Linear(dim_token, self.num_classes[i],bias=self.bias[i]))
+                self.fc.append(nn.Linear(dim_token, self.num_classes[i], bias=self.bias[i]))
         else:
-            self.fc = nn.Linear(dim_token, self.num_classes,bias=self.bias)
+            self.fc = nn.Linear(dim_token, self.num_classes, bias=self.bias)
         # self.head = nn.Linear(dim_token, num_classes)
 
     def _get_kv_compressions(self, layer):
         return (
             (self.shared_kv_compression, self.shared_kv_compression)
             if self.shared_kv_compression is not None
-            else (layer['key_compression'], layer['value_compression'])
-            if 'key_compression' in layer and 'value_compression' in layer
-            else (layer['key_compression'], layer['key_compression'])
-            if 'key_compression' in layer
+            else (layer["key_compression"], layer["value_compression"])
+            if "key_compression" in layer and "value_compression" in layer
+            else (layer["key_compression"], layer["key_compression"])
+            if "key_compression" in layer
             else (None, None)
         )
 
     def _start_residual(self, x, layer, norm_idx):
         x_residual = x
         if self.prenormalization:
-            norm_key = f'norm{norm_idx}'
+            norm_key = f"norm{norm_idx}"
             if norm_key in layer:
                 x_residual = layer[norm_key](x_residual)
         return x_residual
@@ -289,17 +272,17 @@ class FT_Transformer(nn.Module):
             x_residual = F.dropout(x_residual, self.residual_dropout, self.training)
         x = x + x_residual
         if not self.prenormalization:
-            x = layer[f'norm{norm_idx}'](x)
+            x = layer[f"norm{norm_idx}"](x)
         return x
 
     def forward(self, x) -> Tensor:
-        if not self.categorical_indicator is None:
+        if self.categorical_indicator is not None:
             x_num = x[:, ~self.categorical_indicator].float()
-            x_cat = x[:, self.categorical_indicator].long() #TODO
+            x_cat = x[:, self.categorical_indicator].long()  # TODO
         else:
             x_num = x
             x_cat = None
-        #x_cat = None #FIXME
+        # x_cat = None #FIXME
         x = self.tokenizer(x_num, x_cat)
 
         for layer_idx, layer in enumerate(self.layers):
@@ -307,7 +290,7 @@ class FT_Transformer(nn.Module):
             layer = ty.cast(ty.Dict[str, nn.Module], layer)
 
             x_residual = self._start_residual(x, layer, 0)
-            x_residual = layer['attention'](
+            x_residual = layer["attention"](
                 # for the last attention, it is enough to process only [CLS]
                 (x_residual[:, :1] if is_last_layer else x_residual),
                 x_residual,
@@ -318,11 +301,11 @@ class FT_Transformer(nn.Module):
             x = self._end_residual(x, x_residual, layer, 0)
 
             x_residual = self._start_residual(x, layer, 1)
-            x_residual = layer['linear0'](x_residual)
+            x_residual = layer["linear0"](x_residual)
             x_residual = self.activation(x_residual)
             if self.ffn_dropout:
                 x_residual = F.dropout(x_residual, self.ffn_dropout, self.training)
-            x_residual = layer['linear1'](x_residual)
+            x_residual = layer["linear1"](x_residual)
             x = self._end_residual(x, x_residual, layer, 1)
 
         assert x.shape[1] == 1
@@ -339,10 +322,10 @@ class FT_Transformer(nn.Module):
                 output.append(_output)
         else:
             output = self.fc(x)
-        # logits = self.head(x)
+            # logits = self.head(x)
             if not self.regression:
                 output = output.squeeze(-1)
         if self.output_feature:
-            return x,output
-        else:    
+            return x, output
+        else:
             return output
