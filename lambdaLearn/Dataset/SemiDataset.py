@@ -2,11 +2,11 @@ import copy
 
 from torch.utils.data import Dataset
 
-from ..Split.DataSplit import DataSplit
-from ..utils import get_indexing_method
-from .LabeledDataset import LabeledDataset
-from .TrainDataset import TrainDataset
-from .UnlabeledDataset import UnlabeledDataset
+from lambdaLearn.Dataset.LabeledDataset import LabeledDataset
+from lambdaLearn.Dataset.TrainDataset import TrainDataset
+from lambdaLearn.Dataset.UnlabeledDataset import UnlabeledDataset
+from lambdaLearn.Split.DataSplit import DataSplit
+from lambdaLearn.utils import get_indexing_method
 
 
 class SemiDataset(Dataset):
@@ -235,7 +235,3 @@ class SemiDataset(Dataset):
             return self.len_labeled
         else:
             return self.len_unlabeled
-
-
-
-

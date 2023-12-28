@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from .SemiEstimator import SemiEstimator
+from lambdaLearn.Base.SemiEstimator import SemiEstimator
 
 
 class InductiveEstimator(SemiEstimator):

@@ -3,6 +3,7 @@ import copy
 import numpy as np
 import torch
 import torch.nn as nn
+from sklearn.base import RegressorMixin
 
 import lambdaLearn.Config.MeanTeacherReg as config
 from lambdaLearn.Base.DeepModelMixin import DeepModelMixin
@@ -10,7 +11,6 @@ from lambdaLearn.Base.InductiveEstimator import InductiveEstimator
 from lambdaLearn.Loss.MSE import MSE
 from lambdaLearn.Loss.Semi_Supervised_Loss import Semi_Supervised_Loss
 from lambdaLearn.Network.MLPReg import MLPReg
-from lambdaLearn.sklearn.base import RegressorMixin
 from lambdaLearn.utils import Bn_Controller
 
 
