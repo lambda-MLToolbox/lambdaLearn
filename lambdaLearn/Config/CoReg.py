@@ -1,8 +1,6 @@
 from lambdaLearn.Evaluation.Regressor.Mean_Absolute_Error import Mean_Absolute_Error
 from lambdaLearn.Evaluation.Regressor.Mean_Squared_Error import Mean_Squared_Error
-from lambdaLearn.Evaluation.Regressor.Mean_Squared_Log_Error import (
-    Mean_Squared_Log_Error,
-)
+from lambdaLearn.Evaluation.Regressor.Mean_Squared_Log_Error import Mean_Squared_Log_Error
 
 k1=3
 k2=3

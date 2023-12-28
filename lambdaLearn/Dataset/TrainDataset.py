@@ -1,9 +1,8 @@
 from torch.utils.data import Dataset
 
+from lambdaLearn.Dataset.LabeledDataset import LabeledDataset
 from lambdaLearn.Dataset.UnlabeledDataset import UnlabeledDataset
-
-from ..Split.DataSplit import DataSplit
-from .LabeledDataset import LabeledDataset
+from lambdaLearn.Split.DataSplit import DataSplit
 
 
 class TrainDataset(Dataset):
@@ -133,8 +132,3 @@ class TrainDataset(Dataset):
             return self.len_labeled
         else:
             return self.len_unlabeled
-
-
-
-
-

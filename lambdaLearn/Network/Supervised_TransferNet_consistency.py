@@ -1,9 +1,13 @@
 import numpy as np
+import sklearn.metrics
 import torch
 import torch.nn as nn
-from LAMDA_SSL.Loss.Cross_Entropy import Cross_Entropy
+from cvxopt import matrix, solvers
 from torch.autograd import Function
 from torchvision import models
+
+from lambdaLearn.Loss.Cross_Entropy import Cross_Entropy
+from lambdaLearn.utils import to_numpy
 
 resnet_dict = {
     "resnet18": models.resnet18,
@@ -375,8 +379,6 @@ def BNM(src, tar):
     _, out, _ = torch.svd(tar)
     loss = -torch.mean(out)
     return loss
-import sklearn.metrics
-from cvxopt import matrix, solvers
 
 
 def kernel(ker, X1, X2, gamma):
@@ -435,8 +437,6 @@ class KMM:
             beta[index]=max(0,beta[index])
         beta = beta / beta.mean()
         return beta
-
-from LAMDA_SSL.utils import to_numpy
 
 
 class Weight(nn.Module):

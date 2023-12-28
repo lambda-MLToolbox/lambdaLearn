@@ -12,11 +12,7 @@ from sklearn.metrics import check_scoring
 from sklearn.metrics._scorer import _check_multimetric_scoring
 from sklearn.model_selection._search import BaseSearchCV, ParameterGrid
 from sklearn.model_selection._split import check_cv
-from sklearn.model_selection._validation import (
-    _fit_and_score,
-    _insert_error_scores,
-    _warn_about_fit_failures,
-)
+from sklearn.model_selection._validation import _fit_and_score, _insert_error_scores, _warn_about_fit_failures
 from sklearn.utils import check_random_state
 from sklearn.utils.fixes import delayed
 from sklearn.utils.validation import _check_fit_params, indexable
