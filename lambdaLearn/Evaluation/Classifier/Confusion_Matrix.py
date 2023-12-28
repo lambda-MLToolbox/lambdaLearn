@@ -5,7 +5,7 @@ from lambdaLearn.utils import partial
 
 
 class Confusion_Matrix(ClassifierEvaluation):
-    def __init__(self,labels=None, sample_weight=None, normalize=None):
+    def __init__(self, labels=None, sample_weight=None, normalize=None):
         # >> Parameter
         # >> - average: The way to calculate the AUC mean, optional 'micro', 'macro', 'samples', 'weighted' or None.
         # >> - sample_weight: The weight of each sample.
@@ -13,13 +13,15 @@ class Confusion_Matrix(ClassifierEvaluation):
         # >> - multi_class: Method for handling multiple classes, optional 'raise', 'ovr', 'ovo'.
         # >> - labels: The set of contained labels.
         super().__init__()
-        self.labels=labels
+        self.labels = labels
         self.sample_weight = sample_weight
         self.normalize = normalize
-        self.score=partial(confusion_matrix,labels=self.labels,
-                           sample_weight=self.sample_weight,
-                           normalize=self.normalize)
+        self.score = partial(
+            confusion_matrix,
+            labels=self.labels,
+            sample_weight=self.sample_weight,
+            normalize=self.normalize,
+        )
 
-    def scoring(self,y_true,y_pred=None,y_score=None):
-        return self.score(y_true=y_true,y_pred=y_pred)
-
+    def scoring(self, y_true, y_pred=None, y_score=None):
+        return self.score(y_true=y_true, y_pred=y_pred)

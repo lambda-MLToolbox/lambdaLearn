@@ -16,6 +16,7 @@ class GradientReverseLayer(torch.autograd.Function):
         print(x.grad)
 
     """
+
     @staticmethod
     def forward(ctx, coeff, input):
         ctx.coeff = coeff
@@ -29,12 +30,10 @@ class GradientReverseLayer(torch.autograd.Function):
 
 
 class GradientReverseModule(nn.Module):
-
-
     def __init__(self, scheduler):
         super(GradientReverseModule, self).__init__()
         self.scheduler = scheduler
-        self.register_buffer('global_step', torch.zeros(1))
+        self.register_buffer("global_step", torch.zeros(1))
         self.coeff = 0.0
         self.grl = GradientReverseLayer.apply
 
@@ -44,9 +43,11 @@ class GradientReverseModule(nn.Module):
             self.global_step += 1.0
         return self.grl(self.coeff, x)
 
+
 def aToBSheduler(step, A, B, gamma=10, max_iter=10000):
-    ans = A + (2.0 / (1 + np.exp(- gamma * step * 1.0 / max_iter)) - 1.0) * (B - A)
+    ans = A + (2.0 / (1 + np.exp(-gamma * step * 1.0 / max_iter)) - 1.0) * (B - A)
     return float(ans)
+
 
 class AdversarialNet(nn.Module):
     def __init__(self, in_feature):
@@ -55,12 +56,12 @@ class AdversarialNet(nn.Module):
             nn.Linear(in_feature, 16),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
-            nn.Linear(16,16),
+            nn.Linear(16, 16),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
             nn.Linear(16, 1),
-            nn.Sigmoid()
-            )
+            nn.Sigmoid(),
+        )
         self.grl = GradientReverseModule(lambda step: aToBSheduler(step, 0.0, 1.0, gamma=10, max_iter=100000))
 
     def forward(self, x):

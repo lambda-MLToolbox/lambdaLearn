@@ -11,22 +11,28 @@ class SGD(BaseOptimizer):
         # >> - dampening: Dampening for momentum.
         # >> - weight_decay: Weight decay (L2 penalty).
         # >> - nesterov: Enables Nesterov momentum.
-        self.lr=lr
-        self.momentum=momentum
-        self.dampening=dampening
-        self.weight_decay=weight_decay
-        self.nesterov=nesterov
-        defaults = dict(lr=lr, momentum=momentum, dampening=dampening,
-                        weight_decay=weight_decay, nesterov=nesterov)
+        self.lr = lr
+        self.momentum = momentum
+        self.dampening = dampening
+        self.weight_decay = weight_decay
+        self.nesterov = nesterov
+        defaults = dict(
+            lr=lr,
+            momentum=momentum,
+            dampening=dampening,
+            weight_decay=weight_decay,
+            nesterov=nesterov,
+        )
 
         super().__init__(defaults)
 
-    def init_optimizer(self,params):
-        opti=sgd.SGD(params=params, lr=self.lr, momentum=self.momentum, dampening=self.dampening,
-                   weight_decay=self.weight_decay, nesterov=self.nesterov)
+    def init_optimizer(self, params):
+        opti = sgd.SGD(
+            params=params,
+            lr=self.lr,
+            momentum=self.momentum,
+            dampening=self.dampening,
+            weight_decay=self.weight_decay,
+            nesterov=self.nesterov,
+        )
         return opti
-
-
-
-
-

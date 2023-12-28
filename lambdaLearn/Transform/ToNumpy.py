@@ -8,7 +8,7 @@ class ToNumpy(Transformer):
     def __init__(self):
         super().__init__()
 
-    def transform(self,X):
+    def transform(self, X):
         if isinstance(X, np.ndarray):
             return X
         if isinstance(X, dict):

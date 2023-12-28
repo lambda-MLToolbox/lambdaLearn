@@ -1,6 +1,5 @@
 import time
 from collections import defaultdict
-from collections.abc import Mapping
 from itertools import product
 
 import numpy as np
@@ -10,28 +9,30 @@ from sklearn.base import clone, is_classifier
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.metrics import check_scoring
 from sklearn.metrics._scorer import _check_multimetric_scoring
-from sklearn.model_selection._search import BaseSearchCV, ParameterGrid, ParameterSampler
+from sklearn.model_selection._search import BaseSearchCV, ParameterSampler
 from sklearn.model_selection._split import check_cv
 from sklearn.model_selection._validation import _fit_and_score, _insert_error_scores, _warn_about_fit_failures
-from sklearn.utils import check_random_state
 from sklearn.utils.fixes import delayed
 from sklearn.utils.validation import _check_fit_params, indexable
 
 
-def PI(x,gp,y_max=1,xi=0.01,kappa=None):
-    mean,std=gp.predict(x,return_std=True)
-    z=(mean-y_max-xi)/std
+def PI(x, gp, y_max=1, xi=0.01, kappa=None):
+    mean, std = gp.predict(x, return_std=True)
+    z = (mean - y_max - xi) / std
     return norm.cdf(z)
 
-def EI(x,gp,y_max=1,xi=0.01,kappa=None):
-    mean,std=gp.predict(x,return_std=True)
-    a=(mean-y_max-xi)
-    z=a/std
-    return a*norm.cdf(z)+std*norm.pdf(z)
 
-def UCB(x,gp,y_max=None,xi=None,kappa=0.1):
-    mean,std=gp.predict(x,return_std=True)
-    return mean+kappa*std
+def EI(x, gp, y_max=1, xi=0.01, kappa=None):
+    mean, std = gp.predict(x, return_std=True)
+    a = mean - y_max - xi
+    z = a / std
+    return a * norm.cdf(z) + std * norm.pdf(z)
+
+
+def UCB(x, gp, y_max=None, xi=None, kappa=0.1):
+    mean, std = gp.predict(x, return_std=True)
+    return mean + kappa * std
+
 
 class BayesSearchCV(BaseSearchCV):
     def __init__(
@@ -42,8 +43,10 @@ class BayesSearchCV(BaseSearchCV):
         random_state=None,
         warm_up=2,
         lam=3,
-        y_max=1, xi=0.01, kappa=None,
-        acquisition_func='PI',
+        y_max=1,
+        xi=0.01,
+        kappa=None,
+        acquisition_func="PI",
         scoring=None,
         n_jobs=None,
         refit=True,
@@ -82,23 +85,19 @@ class BayesSearchCV(BaseSearchCV):
             error_score=error_score,
             return_train_score=return_train_score,
         )
-        self.lam=lam
-        self.warm_up=warm_up
+        self.lam = lam
+        self.warm_up = warm_up
         self.param_distributions = param_distributions
         self.n_iter = n_iter
         self.random_state = random_state
-        self.acquisition_func=acquisition_func
-        self.y_max=y_max
-        self.xi=xi
-        self.kappa=kappa
+        self.acquisition_func = acquisition_func
+        self.y_max = y_max
+        self.xi = xi
+        self.kappa = kappa
 
     def _run_search(self, evaluate_candidates):
         """Search n_iter candidates from param_distributions"""
-        evaluate_candidates(
-            ParameterSampler(
-                self.param_distributions, self.warm_up, random_state=self.random_state
-            )
-        )
+        evaluate_candidates(ParameterSampler(self.param_distributions, self.warm_up, random_state=self.random_state))
 
     def fit(self, X, y=None, *, groups=None, **fit_params):
         self.GP = GaussianProcessRegressor()
@@ -134,14 +133,14 @@ class BayesSearchCV(BaseSearchCV):
             error_score=self.error_score,
             verbose=self.verbose,
         )
-        if self.acquisition_func is 'PI':
-            self.acquisition_func=PI
-        elif self.acquisition_func is 'EI':
-            self.acquisition_func=EI
-        elif self.acquisition_func is 'UCB':
-            self.acquisition_func=UCB
+        if self.acquisition_func == "PI":
+            self.acquisition_func = PI
+        elif self.acquisition_func == "EI":
+            self.acquisition_func = EI
+        elif self.acquisition_func == "UCB":
+            self.acquisition_func = UCB
         elif callable(self.acquisition_func):
-            self.acquisition_func=self.acquisition_func
+            self.acquisition_func = self.acquisition_func
         else:
             self.acquisition_func = PI
         results = {}
@@ -156,8 +155,7 @@ class BayesSearchCV(BaseSearchCV):
 
             if self.verbose > 0:
                 print(
-                    "Fitting {0} folds for each of {1} candidates,"
-                    " totalling {2} fits".format(
+                    "Fitting {0} folds for each of {1} candidates," " totalling {2} fits".format(
                         n_splits, n_candidates, n_candidates * n_splits
                     )
                 )
@@ -180,11 +178,7 @@ class BayesSearchCV(BaseSearchCV):
             )
 
             if len(out) < 1:
-                raise ValueError(
-                    "No fits were performed. "
-                    "Was the CV iterator empty? "
-                    "Were there no candidates?"
-                )
+                raise ValueError("No fits were performed. " "Was the CV iterator empty? " "Were there no candidates?")
             elif len(out) != n_candidates * n_splits:
                 raise ValueError(
                     "cv.split and cv.get_n_splits returned "
@@ -209,9 +203,7 @@ class BayesSearchCV(BaseSearchCV):
                     all_more_results[key].extend(value)
 
             nonlocal results
-            results = self._format_results(
-                all_candidate_params, n_splits, all_out, all_more_results
-            )
+            results = self._format_results(all_candidate_params, n_splits, all_out, all_more_results)
             return results
 
         with parallel:
@@ -223,31 +215,31 @@ class BayesSearchCV(BaseSearchCV):
         if callable(self.scoring) and self.multimetric_:
             self._check_refit_for_multimetric(first_test_score)
             refit_metric = self.refit
-        params = results['params']
+        params = results["params"]
         score = results[f"mean_test_{refit_metric}"]
-        _X=[]
+        _X = []
         for _ in range(self.warm_up):
             _X.append(list(params[_].values()))
-        _X=np.array(_X)
-        _y=score
+        _X = np.array(_X)
+        _y = score
         for _ in range(self.n_iter):
             self.GP.fit(_X, _y)
-            condidate_params=list(ParameterSampler(
-                self.param_distributions, self.lam, random_state=self.random_state
-            ))
-            _test_X=[]
+            condidate_params = list(
+                ParameterSampler(self.param_distributions, self.lam, random_state=self.random_state)
+            )
+            _test_X = []
             for _ in range(self.lam):
                 _test_X.append(list(condidate_params[_].values()))
-            _test_X=np.array(_test_X)
-            _pred_y=self.acquisition_func(_test_X,gp=self.GP,y_max=self.y_max,xi=self.xi,kappa=self.kappa)
-            idx=_pred_y.argmax()
-            _params=dict()
-            key_idx=0
+            _test_X = np.array(_test_X)
+            _pred_y = self.acquisition_func(_test_X, gp=self.GP, y_max=self.y_max, xi=self.xi, kappa=self.kappa)
+            idx = _pred_y.argmax()
+            _params = dict()
+            key_idx = 0
             for key in list(self.param_distributions.keys()):
-                _params[key]=_test_X[idx][key_idx]
+                _params[key] = _test_X[idx][key_idx]
             evaluate_candidates([_params])
-            _X = np.concatenate((_X, np.expand_dims(_test_X[idx],axis=0)), axis=0)
-            _y= np.concatenate((_y,np.array([_pred_y[idx]])),axis=0)
+            _X = np.concatenate((_X, np.expand_dims(_test_X[idx], axis=0)), axis=0)
+            _y = np.concatenate((_y, np.array([_pred_y[idx]])), axis=0)
 
         first_test_score = all_out[0]["test_scores"]
         self.multimetric_ = isinstance(first_test_score, dict)
@@ -256,22 +248,16 @@ class BayesSearchCV(BaseSearchCV):
             self._check_refit_for_multimetric(first_test_score)
             refit_metric = self.refit
 
-        self.best_index_ = self._select_best_index(
-            self.refit, refit_metric, results
-        )
+        self.best_index_ = self._select_best_index(self.refit, refit_metric, results)
         # With a non-custom callable, we can select the best score
         # based on the best index
-        self.best_score_ = results[f"mean_test_{refit_metric}"][
-            self.best_index_
-        ]
+        self.best_score_ = results[f"mean_test_{refit_metric}"][self.best_index_]
         self.best_params_ = results["params"][self.best_index_]
 
         if self.refit:
             # we clone again after setting params in case some
             # of the params are estimators as well.
-            self.best_estimator_ = clone(
-                clone(base_estimator).set_params(**self.best_params_)
-            )
+            self.best_estimator_ = clone(clone(base_estimator).set_params(**self.best_params_))
             refit_start_time = time.time()
             if y is not None:
                 self.best_estimator_.fit(X, y, **fit_params)

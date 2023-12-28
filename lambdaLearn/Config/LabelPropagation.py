@@ -11,13 +11,13 @@ n_neighbors = 7
 max_iter = 10000
 tol = 1e-3
 n_jobs = None
-evaluation={
-    'accuracy':Accuracy(),
-    'precision':Precision(average='macro'),
-    'Recall':Recall(average='macro'),
-    'F1':F1(average='macro'),
-    'AUC':AUC(multi_class='ovo'),
-    'Confusion_matrix':Confusion_Matrix(normalize='true')
+evaluation = {
+    "accuracy": Accuracy(),
+    "precision": Precision(average="macro"),
+    "Recall": Recall(average="macro"),
+    "F1": F1(average="macro"),
+    "AUC": AUC(multi_class="ovo"),
+    "Confusion_matrix": Confusion_Matrix(normalize="true"),
 }
 verbose = False
 file = None

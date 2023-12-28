@@ -10,15 +10,16 @@ import torch
 import torch.nn as nn
 from scipy import sparse
 from torch.nn.utils.rnn import PackedSequence
-from torch.utils.data import dataset
 
-if LooseVersion(sklearn.__version__) >= '0.22.0':
+if LooseVersion(sklearn.__version__) >= "0.22.0":
     from sklearn.utils import _safe_indexing as safe_indexing
 else:
     from sklearn.utils import safe_indexing
 
+
 def is_pandas_ndframe(x):
-    return hasattr(x, 'iloc')
+    return hasattr(x, "iloc")
+
 
 def indexing_none(data, i):
     return None
@@ -29,21 +30,22 @@ def indexing_dict(data, i):
 
 
 def indexing_list_tuple_of_data(data, i, indexings=None):
-    if len(i)==0:
+    if len(i) == 0:
         return None
     if not indexings:
         return [indexing(x, i) for x in data]
-    return [indexing(x, i, ind)
-            for x, ind in zip(data, indexings)]
+    return [indexing(x, i, ind) for x, ind in zip(data, indexings)]
 
-def indexing_sparse(data,i):
-    data=copy.copy(data)
+
+def indexing_sparse(data, i):
+    data = copy.copy(data)
     data = data.toarray().squeeze(0)
     return data[i]
 
+
 def indexing_ndframe(data, i):
-    if hasattr(data, 'iloc'):
-        data=data.copy(data)
+    if hasattr(data, "iloc"):
+        data = data.copy(data)
         data = {k: data[k].values.reshape(-1, 1) for k in data}
         return data.iloc[i]
     return indexing_dict(data, i)
@@ -52,19 +54,18 @@ def indexing_ndframe(data, i):
 def indexing_other(data, i):
     if isinstance(i, (int, np.integer, slice, tuple)):
         return data[i]
-    #if isinstance(i,(list,np.ndarray)):
-    #print(type(i))
-    if isinstance(i,(list,np.ndarray)):
-        _data=[data[_] for _ in i]
-        if isinstance(data,(np.ndarray)):
-            _data=np.array(_data)
+    # if isinstance(i,(list,np.ndarray)):
+    # print(type(i))
+    if isinstance(i, (list, np.ndarray)):
+        _data = [data[_] for _ in i]
+        if isinstance(data, (np.ndarray)):
+            _data = np.array(_data)
         return _data
     return safe_indexing(data, i)
 
-def indexing_dataset(data,i):
+
+def indexing_dataset(data, i):
     return data[i]
-
-
 
 
 def get_indexing_method(data):
@@ -81,8 +82,8 @@ def get_indexing_method(data):
 
     if isinstance(data, (list, tuple)):
         try:
-            if isinstance(data[0],(Number,str)):
-                raise TypeError('Can not index data!')
+            if isinstance(data[0], (Number, str)):
+                raise TypeError("Can not index data!")
             indexing(data[0], 0)
             indexings = [get_indexing_method(x) for x in data]
             return partial(indexing_list_tuple_of_data, indexings=indexings)
@@ -112,12 +113,14 @@ def indexing(data, i, indexing_method=None):
 
     return get_indexing_method(data)(data, i)
 
+
 def flatten(arr):
     for item in arr:
         if isinstance(item, (tuple, list, dict)):
             yield from flatten(item)
         else:
             yield item
+
 
 def apply_to_data(data, func, unpack_dict=False):
     apply_ = partial(apply_to_data, func=func, unpack_dict=unpack_dict)
@@ -133,23 +136,26 @@ def apply_to_data(data, func, unpack_dict=False):
             return func(data)
     return func(data)
 
+
 def is_sparse(x):
     try:
         return sparse.issparse(x) or x.is_sparse
     except AttributeError:
         return False
 
+
 def _len(data):
-    if isinstance(data,(Number,str)):
-        raise TypeError('Can not get the lengeth of data!')
+    if isinstance(data, (Number, str)):
+        raise TypeError("Can not get the lengeth of data!")
     if data is None:
         return 0
-    elif isinstance(data,torch.utils.data.Dataset):
+    elif isinstance(data, torch.utils.data.Dataset):
         return data.__len__()
     elif is_sparse(data):
         return data.shape[0]
     else:
         return len(data)
+
 
 def get_len(data):
     lens = [apply_to_data(data, _len, unpack_dict=True)]
@@ -157,16 +163,17 @@ def get_len(data):
     len_set = set(lens)
     if len(len_set) > 1:
         raise ValueError("Dataset does not have consistent lengths.")
-    if len(len_set)==0:
+    if len(len_set) == 0:
         return 0
     return list(len_set)[0]
+
 
 def is_torch_data_type(x):
     # pylint: disable=protected-access
     return isinstance(x, (torch.Tensor, PackedSequence))
 
-def to_device(X, device):
 
+def to_device(X, device):
     if device is None:
         return X
 
@@ -180,6 +187,7 @@ def to_device(X, device):
         return X
 
     return X.to(device)
+
 
 # def to_tensor(X, device=None, accept_sparse=False):
 #     to_tensor_ = partial(to_tensor, device=device)
@@ -226,6 +234,7 @@ def to_numpy(X):
         X = X.detach()
     return X.numpy()
 
+
 # def to_image(X):
 #     if isinstance(X,Image.Image):
 #         return X
@@ -234,10 +243,12 @@ def to_numpy(X):
 #         X=Image.fromarray(X)
 #         return X
 
+
 class partial:
     """New function with partial application of the given arguments
     and keywords.
     """
+
     __slots__ = "func", "args", "keywords", "__dict__", "__weakref__"
 
     def __new__(*args, **keywords):
@@ -272,9 +283,11 @@ class partial:
         newkeywords = self.keywords.copy()
         newkeywords.update(keywords)
         return self.func(*self.args, *args, **newkeywords)
-    def change(self,**keywords):
+
+    def change(self, **keywords):
         self.keywords.update(keywords)
         return self
+
     @recursive_repr()
     def __repr__(self):
         qualname = type(self).__qualname__
@@ -286,8 +299,11 @@ class partial:
         return f"{qualname}({', '.join(args)})"
 
     def __reduce__(self):
-        return type(self), (self.func,), (self.func, self.args,
-               self.keywords or None, self.__dict__ or None)
+        return (
+            type(self),
+            (self.func,),
+            (self.func, self.args, self.keywords or None, self.__dict__ or None),
+        )
 
     def __setstate__(self, state):
         if not isinstance(state, tuple):
@@ -295,15 +311,18 @@ class partial:
         if len(state) != 4:
             raise TypeError(f"expected 4 items in state, got {len(state)}")
         func, args, kwds, namespace = state
-        if (not callable(func) or not isinstance(args, tuple) or
-           (kwds is not None and not isinstance(kwds, dict)) or
-           (namespace is not None and not isinstance(namespace, dict))):
+        if (
+            not callable(func)
+            or not isinstance(args, tuple)
+            or (kwds is not None and not isinstance(kwds, dict))
+            or (namespace is not None and not isinstance(namespace, dict))
+        ):
             raise TypeError("invalid partial state")
 
-        args = tuple(args) # just in case it's a subclass
+        args = tuple(args)  # just in case it's a subclass
         if kwds is None:
             kwds = {}
-        elif type(kwds) is not dict: # XXX does it need to be *exactly* dict?
+        elif type(kwds) is not dict:  # XXX does it need to be *exactly* dict?
             kwds = dict(kwds)
         if namespace is None:
             namespace = {}
@@ -312,6 +331,7 @@ class partial:
         self.func = func
         self.args = args
         self.keywords = kwds
+
 
 class EMA:
     """
@@ -354,15 +374,17 @@ class EMA:
                 param.data = self.backup[name]
         self.backup = {}
 
+
 class class_status:
-    def __init__(self,y):
-        self.y=y
+    def __init__(self, y):
+        self.y = y
         try:
             self.y_arr = to_numpy(self.y)
         except (AttributeError, TypeError):
             self.y_arr = self.y
         if self.y_arr.ndim == 2:
             self.y_arr = np.array([" ".join(row.astype("str")) for row in self.y_arr])
+
     @property
     def classes(self):
         classes, y_indices = np.unique(self.y_arr, return_inverse=True)
@@ -387,13 +409,14 @@ class class_status:
 
 
 def _l2_normalize(d):
-    d /= (torch.sqrt(torch.sum(d ** 2, dim=tuple(range(1,len(d.shape))))).reshape((-1,)+(1,)*len(d.shape[1:])) + 1e-16)
+    d /= torch.sqrt(torch.sum(d**2, dim=tuple(range(1, len(d.shape))))).reshape((-1,) + (1,) * len(d.shape[1:])) + 1e-16
     return d
 
 
-def one_hot(targets, nClass,device):
+def one_hot(targets, nClass, device):
     logits = torch.zeros(targets.size(0), nClass).to(device)
     return logits.scatter_(1, targets.unsqueeze(1).long(), 1)
+
 
 class Bn_Controller:
     def __init__(self):
@@ -406,14 +429,14 @@ class Bn_Controller:
         assert self.backup == {}
         for name, m in model.named_modules():
             if isinstance(m, nn.SyncBatchNorm) or isinstance(m, nn.BatchNorm2d):
-                self.backup[name + '.running_mean'] = m.running_mean.data.clone()
-                self.backup[name + '.running_var'] = m.running_var.data.clone()
-                self.backup[name + '.num_batches_tracked'] = m.num_batches_tracked.data.clone()
+                self.backup[name + ".running_mean"] = m.running_mean.data.clone()
+                self.backup[name + ".running_var"] = m.running_var.data.clone()
+                self.backup[name + ".num_batches_tracked"] = m.num_batches_tracked.data.clone()
 
     def unfreeze_bn(self, model):
         for name, m in model.named_modules():
             if isinstance(m, nn.SyncBatchNorm) or isinstance(m, nn.BatchNorm2d):
-                m.running_mean.data = self.backup[name + '.running_mean']
-                m.running_var.data = self.backup[name + '.running_var']
-                m.num_batches_tracked.data = self.backup[name + '.num_batches_tracked']
+                m.running_mean.data = self.backup[name + ".running_mean"]
+                m.running_var.data = self.backup[name + ".running_var"]
+                m.num_batches_tracked.data = self.backup[name + ".num_batches_tracked"]
         self.backup = {}

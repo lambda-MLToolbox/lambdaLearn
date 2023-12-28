@@ -7,9 +7,14 @@ class DataParallel:
         # >> - device_ids: Available GPUs.
         # >> - output_device: The GPU where the output result is stored.
         # >> - dim: The dimension of data aggregation from each device.
-        self.device_ids=device_ids
-        self.output_device=output_device
-        self.dim=dim
-    def init_parallel(self,module):
-        return nn.DataParallel(module=module,device_ids=self.device_ids,
-                               output_device=self.output_device,dim=self.dim)
+        self.device_ids = device_ids
+        self.output_device = output_device
+        self.dim = dim
+
+    def init_parallel(self, module):
+        return nn.DataParallel(
+            module=module,
+            device_ids=self.device_ids,
+            output_device=self.output_device,
+            dim=self.dim,
+        )
