@@ -1,0 +1,8 @@
+# Introduce isort and sort packages (#4)
+b1aec6abfcd5bdfaa0ee9fd8c775484845a2a437
+
+# Introduce ruff as code formatter and format code (#6)
+da5b8b30ca8cfb911f5bc5624884625475a673dc
+
+# Convert code documents to sphinx docstring format (#7)
+0ca07a78e394832ad0a64b7f4d227d84b6c03787
