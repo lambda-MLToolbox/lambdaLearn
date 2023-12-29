@@ -4,9 +4,10 @@ from lambdaLearn.Base.Transformer import Transformer
 class StandardScaler(Transformer):
     def __init__(self, mean=None, std=None):
         super().__init__()
-        # >> Parameter:
-        # >> - mean: The value of mean.
-        # >> - std: The value of standard deviation.
+        """
+        :param mean: The value of mean.
+        :param std: The value of standard deviation.
+        """
         self.mean = mean
         self.std = std
 

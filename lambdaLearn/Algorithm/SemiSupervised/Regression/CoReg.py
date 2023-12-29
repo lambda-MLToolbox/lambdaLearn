@@ -23,13 +23,14 @@ class CoReg(InductiveEstimator, RegressorMixin):
         verbose=config.verbose,
         file=config.file,
     ):
-        # >> Parameter
-        # >> - k1: The k value for the k-nearest neighbors in the first base learner.
-        # >> - k2: The k value for the k-nearest neighbors in the second base learner.
-        # >> - p1: The order of the distance calculated in the first base learner.
-        # >> - p2: The order of the distance calculated in the second base learner.
-        # >> - max_iters: The maximum number of iterations.
-        # >> - pool_size: The size of the buffer pool.
+        """
+        :param k1: The k value for the k-nearest neighbors in the first base learner.
+        :param k2: The k value for the k-nearest neighbors in the second base learner.
+        :param p1: The order of the distance calculated in the first base learner.
+        :param p2: The order of the distance calculated in the second base learner.
+        :param max_iters: The maximum number of iterations.
+        :param pool_size: The size of the buffer pool.
+        """
         self.k1 = k1
         self.k2 = k2
         self.p1 = p1

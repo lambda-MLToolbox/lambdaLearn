@@ -9,8 +9,9 @@ from lambdaLearn.Base.Transformer import Transformer
 class Noise(Transformer):
     def __init__(self, noise_level=0.1):
         super().__init__()
-        # >> Parameter:
-        # >> - noise_level: the level of noise.
+        """
+        :param noise_level: the level of noise.
+        """
         self.noise_level = noise_level
 
     def transform(self, X):

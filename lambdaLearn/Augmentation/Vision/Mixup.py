@@ -5,8 +5,9 @@ from lambdaLearn.Base.Transformer import Transformer
 
 class Mixup(Transformer):
     def __init__(self, alpha=0.5):
-        # >> Parameter:
-        # >> - alpha: The parameter of the beta distribution.
+        """
+        :param alpha: The parameter of the beta distribution.
+        """
         super().__init__()
         self.alpha = alpha
         self.lam = None

@@ -9,7 +9,9 @@ class TabularMixin:
         pass
 
     def init_default_transforms(self):
-        # >> init_default_transform: Initialize the default data transformation method.
+        """
+        Initialize the default data transformation method.
+        """
         self.transforms = None
         self.target_transform = None
         self.pre_transform = Pipeline([("StandardScaler", preprocessing.StandardScaler())])

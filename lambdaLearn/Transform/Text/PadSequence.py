@@ -3,9 +3,10 @@ from lambdaLearn.Base.Transformer import Transformer
 
 class PadSequence(Transformer):
     def __init__(self, length=300, pad_val=None):
-        # > Parameter:
-        # >> - length: The length of the text after padding.
-        # >> - pad_val: The padding value for insufficient length of text.
+        """
+        :param length: The length of the text after padding.
+        :param pad_val: The padding value for insufficient length of text.
+        """
         super(PadSequence, self).__init__()
         self.pad_val = pad_val
         self.length = length

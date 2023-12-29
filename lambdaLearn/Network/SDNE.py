@@ -5,10 +5,11 @@ import torch
 
 class SDNE(torch.nn.Module):
     def __init__(self, dim_in, hidden_layers, device="cpu"):
-        # >> Parameter:
-        # >> - input_dim: The dimension of the input samples.
-        # >> - hidden_layers: The dimension of the hidden layers.
-        # >> - device: The device to train the model.
+        """
+        :param input_dim: The dimension of the input samples.
+        :param hidden_layers: The dimension of the hidden layers.
+        :param device: The device to train the model.
+        """
         super(SDNE, self).__init__()
         self.device = device
         dim_in_copy = copy.copy(dim_in)

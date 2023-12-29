@@ -5,10 +5,11 @@ from lambdaLearn.Base.BaseSampler import BaseSampler
 
 class RandomSampler(BaseSampler):
     def __init__(self, replacement: bool = False, num_samples=None, generator=None):
-        # >> Parameter:
-        # >> - replacement: samples are drawn on-demand with replacement if True.
-        # >> - num_samples: The number of samples
-        # >> - generator: Generator used in sampling.
+        """
+        :param replacement: samples are drawn on-demand with replacement if True.
+        :param num_samples: The number of samples
+        :param generator: Generator used in sampling.
+        """
 
         super().__init__()
         self.replacement = replacement
@@ -16,8 +17,11 @@ class RandomSampler(BaseSampler):
         self.generator = generator
 
     def init_sampler(self, data_source):
-        # >> init_sampler(data_source):  Initialize the sampler with data.
-        # >> - data_source: The data to be sampled.
+        """
+        Initialize the sampler with data.
+
+        :param data_source: The data to be sampled.
+        """
         return sampler.RandomSampler(
             data_source=data_source,
             replacement=self.replacement,

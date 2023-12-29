@@ -8,9 +8,10 @@ from lambdaLearn.Base.Transformer import Transformer
 
 class ToImage(Transformer):
     def __init__(self, channels=3, channels_first=False, load_from_path=False, format=None):
-        # > - Parameter:
-        # >> - channels: The number of channels of input images.
-        # >> - channels_first: Whether the number of channels is before the image size.
+        """
+        :param channels: The number of channels of input images.
+        :param channels_first: Whether the number of channels is before the image size.
+        """
         super(ToImage, self).__init__()
         self.channels = channels
         self.channels_first = channels_first

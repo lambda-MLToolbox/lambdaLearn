@@ -20,16 +20,16 @@ class TextMixin:
         special_first=True,
         default_index=None,
     ):
-        # >> parameter:
-        # >> - word_vocab: A map that converts words to indexes.
-        # >> - vectors: Word vectors.
-        # >> - length: Length of each sentence.
-        # >> - unk_token: The token used to represent unknown words.
-        # >> - pad_token: The token used to represent padding.
-        # >> - min_freq: The minimum frequency required for a word to be used as a token in the word_vocab. It is valid when word_vocab is None and a mapping table needs to be constructed.
-        # >> - special_first: Whether to put special characters at the top of the mapping table.
-        # >> - default_index: The default value that should be used when converting a word to an index if it cannot be converted.
-        # >> init_default_transform: Initialize the data transformation method.
+        """
+        :param word_vocab: A map that converts words to indexes.
+        :param vectors: Word vectors.
+        :param length: Length of each sentence.
+        :param unk_token: The token used to represent unknown words.
+        :param pad_token: The token used to represent padding.
+        :param min_freq: The minimum frequency required for a word to be used as a token in the word_vocab. It is valid when word_vocab is None and a mapping table needs to be constructed.
+        :param special_first: Whether to put special characters at the top of the mapping table.
+        :param default_index: The default value that should be used when converting a word to an index if it cannot be converted.
+        """
         self.vectors = vectors
         self.word_vocab = word_vocab
         self.length = length
@@ -41,6 +41,9 @@ class TextMixin:
         self.default_index = default_index
 
     def init_default_transforms(self):
+        """
+        Initialize the data transformation method.
+        """
         if self.vectors is not None:
             self.vocab = Vocab(vectors=self.vectors.vec)
 

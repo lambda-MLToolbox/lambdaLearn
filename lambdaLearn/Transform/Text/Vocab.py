@@ -18,15 +18,16 @@ class Vocab(Transformer):
         default_index=None,
         tokenizer=None,
     ):
-        # >> Parameter:
-        # >> - word_vocab: A map that converts words to indexes.
-        # >> - vectors: Word vectors.
-        # >> - text: When word_vocab is None, use text to create a mapping table.
-        # >> - min_freq: The minimum frequency required for a word to be used as a token in the word_vocab. It is valid when word_vocab is None and a mapping table needs to be constructed.
-        # >> - specials: List of special characters.
-        # >> - special_first: Whether to put special characters at the top of the mapping table.
-        # >> - default_index: The default value that should be used when converting a word to an index if it cannot be converted.
-        # >> - tokenizer: The word segmentation method used.
+        """
+        :param word_vocab: A map that converts words to indexes.
+        :param vectors: Word vectors.
+        :param text: When word_vocab is None, use text to create a mapping table.
+        :param min_freq: The minimum frequency required for a word to be used as a token in the word_vocab. It is valid when word_vocab is None and a mapping table needs to be constructed.
+        :param specials: List of special characters.
+        :param special_first: Whether to put special characters at the top of the mapping table.
+        :param default_index: The default value that should be used when converting a word to an index if it cannot be converted.
+        :param tokenizer: The word segmentation method used.
+        """
         super(Vocab, self).__init__()
         self.text = text
         self.specials = specials

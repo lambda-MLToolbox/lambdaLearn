@@ -54,38 +54,39 @@ class DeepModelMixin(SemiEstimator):
         file=None,
         verbose=True,
     ):
-        # >> Parameter
-        # >> - train_dataset: Data manager for training data.
-        # >> - labeled_dataset: Data manager for labeled data.
-        # >> - unlabeled_dataset: Data manager for unlabeled data.
-        # >> - valid_dataset: Data manager for valid data.
-        # >> - test_dataset: Data manager for test data.
-        # >> - augmentation: Augmentation method, if there are multiple augmentation methods, you can use a dictionary or a list to pass parameters.
-        # >> - network: The backbone neural network.
-        # >> - epoch: Number of training epochs.
-        # >> - num_it_epoch: The number of iterations in each round, that is, the number of batches of data.
-        # >> - num_it_total: The total number of batches.
-        # >> - eval_epoch: Model evaluation is performed every eval_epoch epochs.
-        # >> - eval_it: Model evaluation is performed every eval_it iterations.
-        # >> - mu: The ratio of the number of unlabeled data to the number of labeled data.
-        # >> - optimizer: The optimizer used in training.
-        # >> - weight_decay: The optimizer's learning rate decay parameter.
-        # >> - ema_decay: The update scale for the exponential moving average of the model parameters.
-        # >> - scheduler: Learning rate scheduler.
-        # >> - device: Training equipment.
-        # >> - evaluation: Model evaluation metrics. If there are multiple metrics, a dictionary or a list can be used.
-        # >> - train_sampler: Sampler of training data.
-        # >> - labeled_sampler=None: Sampler of labeled data.
-        # >> - unlabeled_sampler=None: Sampler of unlabeled data.
-        # >> - train_batch_sampler=None: Batch sampler of training data
-        # >> - labeled_batch_sampler: Batch sampler of labeled data
-        # >> - unlabeled_batch_sampler: Batch sampler of unlabeled data
-        # >> - valid_sampler: sampler of valid data.
-        # >> - valid_batch_sampler: Batch sampler of valid data.
-        # >> - test_sampler: Sampler of test data.
-        # >> - test_batch_sampler: Batch sampler of test data.
-        # >> - parallel: Distributed training method.
-        # >> - file: Output file.
+        """
+        :param train_dataset: Data manager for training data.
+        :param labeled_dataset: Data manager for labeled data.
+        :param unlabeled_dataset: Data manager for unlabeled data.
+        :param valid_dataset: Data manager for valid data.
+        :param test_dataset: Data manager for test data.
+        :param augmentation: Augmentation method, if there are multiple augmentation methods, you can use a dictionary or a list to pass parameters.
+        :param network: The backbone neural network.
+        :param epoch: Number of training epochs.
+        :param num_it_epoch: The number of iterations in each round, that is, the number of batches of data.
+        :param num_it_total: The total number of batches.
+        :param eval_epoch: Model evaluation is performed every eval_epoch epochs.
+        :param eval_it: Model evaluation is performed every eval_it iterations.
+        :param mu: The ratio of the number of unlabeled data to the number of labeled data.
+        :param optimizer: The optimizer used in training.
+        :param weight_decay: The optimizer's learning rate decay parameter.
+        :param ema_decay: The update scale for the exponential moving average of the model parameters.
+        :param scheduler: Learning rate scheduler.
+        :param device: Training equipment.
+        :param evaluation: Model evaluation metrics. If there are multiple metrics, a dictionary or a list can be used.
+        :param train_sampler: Sampler of training data.
+        :param labeled_sampler=None: Sampler of labeled data.
+        :param unlabeled_sampler=None: Sampler of unlabeled data.
+        :param train_batch_sampler=None: Batch sampler of training data
+        :param labeled_batch_sampler: Batch sampler of labeled data
+        :param unlabeled_batch_sampler: Batch sampler of unlabeled data
+        :param valid_sampler: sampler of valid data.
+        :param valid_batch_sampler: Batch sampler of valid data.
+        :param test_sampler: Sampler of test data.
+        :param test_batch_sampler: Batch sampler of test data.
+        :param parallel: Distributed training method.
+        :param file: Output file.
+        """
         self.train_dataset = train_dataset
         self.labeled_dataset = labeled_dataset
         self.unlabeled_dataset = unlabeled_dataset

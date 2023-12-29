@@ -13,12 +13,13 @@ class AUC(ClassifierEvaluation):
         multi_class="raise",
         labels=None,
     ):
-        # >> Parameter
-        # >> - average: The way to calculate the AUC mean, optional 'micro', 'macro', 'samples', 'weighted' or None.
-        # >> - sample_weight: The weight of each sample.
-        # >> - max_fpr: Used to determine the range when only a partial AUC is calculated.
-        # >> - multi_class: Method for handling multiple classes, optional 'raise', 'ovr', 'ovo'.
-        # >> - labels: The set of contained labels.
+        """
+        :param average: The way to calculate the AUC mean, optional 'micro', 'macro', 'samples', 'weighted' or None.
+        :param sample_weight: The weight of each sample.
+        :param max_fpr: Used to determine the range when only a partial AUC is calculated.
+        :param multi_class: Method for handling multiple classes, optional 'raise', 'ovr', 'ovo'.
+        :param labels: The set of contained labels.
+        """
         super().__init__()
         self.average = average
         self.sample_weight = sample_weight

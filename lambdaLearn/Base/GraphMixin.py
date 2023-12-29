@@ -8,7 +8,9 @@ class GraphMixin:
         pass
 
     def init_default_transforms(self):
-        # >> init_default_transform: Initialize the data transformation method.
+        """
+        Initialize the data transformation method.
+        """
         self.transforms = None
         self.target_transform = None
         self.transform = Pipeline([("NormalizeFeatures", NormalizeFeatures())])

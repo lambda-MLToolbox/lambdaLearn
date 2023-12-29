@@ -5,12 +5,13 @@ from torch_geometric.nn import GATConv
 
 class GAT(torch.nn.Module):
     def __init__(self, dim_in, num_classes, dim_hidden=16, heads=8, dropout=0.6):
-        # >> Parameter:
-        # >> - dim_in: Node feature dimension.
-        # >> - dim_hidden: the dimension of hidden layers.
-        # >> - num_classes: Number of classes.
-        # >> - dropout: The dropout rate.
-        # >> - heads: The number of heads.
+        """
+        :param dim_in: Node feature dimension.
+        :param dim_hidden: the dimension of hidden layers.
+        :param num_classes: Number of classes.
+        :param dropout: The dropout rate.
+        :param heads: The number of heads.
+        """
         super().__init__()
         self.dropout = dropout
         self.conv1 = GATConv(dim_in, dim_hidden, heads, dropout=dropout)

@@ -6,9 +6,10 @@ from lambdaLearn.Transform.Text.Tokenizer import Tokenizer
 
 class RandomDeletion(Transformer):
     def __init__(self, p=0.5, tokenizer=None):
-        # >> Parameter:
-        # >> - p: The proportion of random deletions.
-        # >> - tokenizer: The tokenizer used when the text is not untokenized.
+        """
+        :param p: The proportion of random deletions.
+        :param tokenizer: The tokenizer used when the text is not untokenized.
+        """
         super(RandomDeletion, self).__init__()
         self.p = p
         self.tokenizer = tokenizer if tokenizer is not None else Tokenizer("basic_english", "en")

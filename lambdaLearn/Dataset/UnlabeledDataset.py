@@ -8,9 +8,10 @@ from lambdaLearn.utils import get_indexing_method, get_len, indexing
 
 class UnlabeledDataset(Dataset):
     def __init__(self, pre_transform=None, transform=None):
-        # >> Parameter
-        # >> - pre_transform: The way to preprocess X before augmentation.
-        # >> - transform: The way to transform X after data augmentation.
+        """
+        :param pre_transform: The way to preprocess X before augmentation.
+        :param transform: The way to transform X after data augmentation.
+        """
         self.transform = transform
         self.pre_transform = pre_transform
         self.X = None

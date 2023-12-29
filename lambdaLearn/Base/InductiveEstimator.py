@@ -8,6 +8,9 @@ class InductiveEstimator(SemiEstimator):
 
     @abstractmethod
     def predict(self, X):
-        # >> predict(X): Make predictions on the new data.
-        # >> - X: Samples to be predicted.
+        """
+        Make predictions on the new data.
+
+        :param X: Samples to be predicted.
+        """
         raise NotImplementedError("Predict method must be implemented.")

@@ -54,15 +54,16 @@ class FixMatch(InductiveEstimator, DeepModelMixin, ClassifierMixin):
         file=config.file,
         verbose=config.verbose,
     ):
-        # >> Parameter:
-        # >> - threshold: The confidence threshold for choosing samples.
-        # >> - lambda_u: The weight of unsupervised loss.
-        # >> - T: Sharpening temperature.
-        # >> - num_classes: The number of classes for the classification task.
-        # >> - thresh_warmup: Whether to use threshold warm-up mechanism.
-        # >> - use_hard_labels: Whether to use hard labels in the consistency regularization.
-        # >> - use_DA: Whether to perform distribution alignment for soft labels.
-        # >> - p_target: p(y) based on the labeled examples seen during training.
+        """
+        :param threshold: The confidence threshold for choosing samples.
+        :param lambda_u: The weight of unsupervised loss.
+        :param T: Sharpening temperature.
+        :param num_classes: The number of classes for the classification task.
+        :param thresh_warmup: Whether to use threshold warm-up mechanism.
+        :param use_hard_labels: Whether to use hard labels in the consistency regularization.
+        :param use_DA: Whether to perform distribution alignment for soft labels.
+        :param p_target: p(y) based on the labeled examples seen during training.
+        """
 
         DeepModelMixin.__init__(
             self,

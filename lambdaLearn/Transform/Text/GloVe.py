@@ -16,14 +16,15 @@ class Glove(Transformer):
         unk_token="<unk>",
         cache=None,
     ):
-        # >> Parameter:
-        # >> - name: The name of the word vector.
-        # >> - dim: The dimension of the word vector.
-        # >> - lower_case_backup: Whether to convert all to lowercase when looking up words.
-        # >> - unk_init: By default, initialize out-of-vocabulary word vectors to zero vectors; can be any function that takes in a Tensor and returns a Tensor of the same size.
-        # >> - pad_init: By default, initialize out-of-vocabulary word vectors to zero vectors; can be any function that takes in a Tensor and returns a Tensor of the same size.
-        # >> - pad_token: The default padding token.
-        # >> - unk_token: The default token represents unknown words.
+        """
+        :param name: The name of the word vector.
+        :param dim: The dimension of the word vector.
+        :param lower_case_backup: Whether to convert all to lowercase when looking up words.
+        :param unk_init: By default, initialize out-of-vocabulary word vectors to zero vectors; can be any function that takes in a Tensor and returns a Tensor of the same size.
+        :param pad_init: By default, initialize out-of-vocabulary word vectors to zero vectors; can be any function that takes in a Tensor and returns a Tensor of the same size.
+        :param pad_token: The default padding token.
+        :param unk_token: The default token represents unknown words.
+        """
         super().__init__()
         self.vec = vocab.GloVe(name, dim, cache=cache)
         self.unk_init = torch.Tensor.zero_ if unk_init is None else unk_init

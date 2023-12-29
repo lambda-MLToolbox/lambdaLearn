@@ -5,8 +5,9 @@ from lambdaLearn.Base.Transformer import Transformer
 
 class SVDFeatureReduction(Transformer):
     def __init__(self, out_channels):
-        # >> Parameter:
-        # >> - out_channels: The dimensionlity of node features after reduction.
+        """
+        :param out_channels: The dimensionlity of node features after reduction.
+        """
         super().__init__()
         self.svd_feature_reduction = gt.SVDFeatureReduction(out_channels=out_channels)
 

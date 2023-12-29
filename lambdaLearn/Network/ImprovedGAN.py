@@ -161,17 +161,18 @@ class ImprovedGAN(nn.Module):
         dim_z=100,
         device="cpu",
     ):
-        # >> Parameter
-        # >> - G: The neural network of generator.
-        # >> - D: The neural network of discriminator
-        # >> - dim_in: The dimension of the inputted samples.
-        # >> - hidden_G: The dimension of the generator's hidden layers.
-        # >> - hidden_D: The dimension of the discriminator's hidden layers.
-        # >> - activations_G: The activation functions for each layer of the generator.
-        # >> - activations_D: The activation functions for each layer of the discriminator.
-        # >> - output_dim: The dimension of outputs.
-        # >> - z_dim: The dimension of the hidden variable used to generate data.
-        # >> - device: The device to train the model.
+        """
+        :param G: The neural network of generator.
+        :param D: The neural network of discriminator
+        :param dim_in: The dimension of the inputted samples.
+        :param hidden_G: The dimension of the generator's hidden layers.
+        :param hidden_D: The dimension of the discriminator's hidden layers.
+        :param activations_G: The activation functions for each layer of the generator.
+        :param activations_D: The activation functions for each layer of the discriminator.
+        :param output_dim: The dimension of outputs.
+        :param z_dim: The dimension of the hidden variable used to generate data.
+        :param device: The device to train the model.
+        """
         super(ImprovedGAN, self).__init__()
         if isinstance(dim_in, numbers.Number):
             input_dim = dim_in
