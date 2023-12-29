@@ -5,10 +5,11 @@ import torch.nn as nn
 class MLPCLS(torch.nn.Module):
     # define model elements
     def __init__(self, dim_in=28**2, hidden_dim=[10], activations=[nn.ReLU()], num_classes=2):
-        # >> Parameter
-        # >> - input_dim: The dimension of input samples.
-        # >> - hidden_dim: The dimension of hidden layers.
-        # >> - activations: The activation functions used in the hidden layers.
+        """
+        :param input_dim: The dimension of input samples.
+        :param hidden_dim: The dimension of hidden layers.
+        :param activations: The activation functions used in the hidden layers.
+        """
         super(MLPCLS, self).__init__()
         # input to first hidden layer
         self.num_hidden = len(hidden_dim)

@@ -8,8 +8,9 @@ from lambdaLearn.Base.Transformer import Transformer
 
 class Equalize(Transformer):
     def __init__(self, scale=255):
-        # >> Parameter:
-        # >> - scale: Scale of image pixel values
+        """
+        :param scale: Scale of image pixel values
+        """
         super().__init__()
         self.scale = scale
 

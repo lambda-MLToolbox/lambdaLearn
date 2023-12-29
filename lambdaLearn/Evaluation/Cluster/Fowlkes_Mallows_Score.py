@@ -6,8 +6,9 @@ from lambdaLearn.utils import partial
 
 class Fowlkes_Mallows_Score(ClusterEvaluation):
     def __init__(self, sparse=False):
-        # >> Parameter
-        # >> - sparse: Whether to use sparse matrices for computation.
+        """
+        :param sparse: Whether to use sparse matrices for computation.
+        """
         super().__init__()
         self.score = partial(fowlkes_mallows_score, sparse=sparse)
 

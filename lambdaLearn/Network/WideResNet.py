@@ -133,11 +133,12 @@ class WideResNet(nn.Module):
         channel_in=3,
         output_features=False,
     ):
-        # >> Parameter:
-        # >> - num_classes: The number of classes.
-        # >> - depth: The depth of network.
-        # >> - widen_factor: The width of the network.It is used to determine hidden layer dimensions.
-        # >> - dropout: The dropout rate.
+        """
+        :param num_classes: The number of classes.
+        :param depth: The depth of network.
+        :param widen_factor: The width of the network.It is used to determine hidden layer dimensions.
+        :param dropout: The dropout rate.
+        """
         super(WideResNet, self).__init__()
         self.channels = channel_in
         channels = [16, 16 * widen_factor, 32 * widen_factor, 64 * widen_factor]

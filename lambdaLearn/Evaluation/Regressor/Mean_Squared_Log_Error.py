@@ -6,10 +6,11 @@ from lambdaLearn.utils import partial
 
 class Mean_Squared_Log_Error(RegressorEvaluation):
     def __init__(self, sample_weight=None, multioutput="uniform_average", squared=True):
-        # >> Parameter
-        # >> - sample_weight: The weight of each sample.
-        # >> - multioutput: Aggregation method for multiple outputs.
-        # >> - squared: If True, output the MSLE loss, otherwise output the RMSLE loss.
+        """
+        :param sample_weight: The weight of each sample.
+        :param multioutput: Aggregation method for multiple outputs.
+        :param squared: If True, output the MSLE loss, otherwise output the RMSLE loss.
+        """
         super().__init__()
         self.sample_weight = sample_weight
         self.multioutput = multioutput

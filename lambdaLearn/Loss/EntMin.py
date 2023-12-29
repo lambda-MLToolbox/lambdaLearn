@@ -5,14 +5,18 @@ import torch.nn.functional as F
 
 class EntMin(nn.Module):
     def __init__(self, reduction="mean", activation=None):
-        # >> - reduction: How to handle the output.
-        # >> - activation: The activation function to process on the logits.
+        """
+        :param reduction: How to handle the output.
+        :param activation: The activation function to process on the logits.
+        """
         super(EntMin, self).__init__()
         self.activation = activation
         self.reduction = reduction
 
     def forward(self, logits):
-        # >> -logits: The logits to calculate the loss.
+        """
+        :param The logits to calculate the loss.
+        """
         if self.activation is not None:
             p = self.activation(logits)
         else:

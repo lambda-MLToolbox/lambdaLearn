@@ -127,13 +127,14 @@ def get_split_index(y, num_1, num_2, stratified, shuffle, random_state=None):
 
 
 def DataSplit(stratified=True, shuffle=True, random_state=None, X=None, y=None, size_split=None):
-    # >> Parameter
-    # >> - stratified: Whether to stratify by classes.
-    # >> - shuffle: Whether to shuffle the data.
-    # >> - random_state: The random seed.
-    # >> - X: Samples of the data to be split.
-    # >> - y: Labels of the data to be split.
-    # >> - labeled_size: The scale or size of the labeled data.
+    """
+    :param stratified: Whether to stratify by classes.
+    :param shuffle: Whether to shuffle the data.
+    :param random_state: The random seed.
+    :param X: Samples of the data to be split.
+    :param y: Labels of the data to be split.
+    :param size_split: The scale or size of the labeled data.
+    """
     num_1, num_2 = get_split_num(X, size_split)
     ind_1, ind_2 = get_split_index(
         y=y,

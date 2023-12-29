@@ -17,16 +17,17 @@ class Vectors(Transformer):
         pad_token="<pad>",
         unk_token="<unk>",
     ):
-        # >> Parameter:
-        # >> - name: The name of the word vector.
-        # >> - cache: Directory for cached vectors。
-        # >> - url: The download address of the word vector.
-        # >> - unk_init: By default, initialize out-of-vocabulary word vectors to zero vectors; can be any function that takes in a Tensor and returns a Tensor of the same size.
-        # >> - pad_init: By default, initialize out-of-vocabulary word vectors to zero vectors; can be any function that takes in a Tensor and returns a Tensor of the same size.
-        # >> - max_vectors: The maximum number of word vectors.
-        # >> - lower_case_backup: Whether to convert all to lowercase when looking up words.
-        # >> - pad_token: The default padding token.
-        # >> - unk_token: The default token represents unknown words.
+        """
+        :param name: The name of the word vector.
+        :param cache: Directory for cached vectors。
+        :param url: The download address of the word vector.
+        :param unk_init: By default, initialize out-of-vocabulary word vectors to zero vectors; can be any function that takes in a Tensor and returns a Tensor of the same size.
+        :param pad_init: By default, initialize out-of-vocabulary word vectors to zero vectors; can be any function that takes in a Tensor and returns a Tensor of the same size.
+        :param max_vectors: The maximum number of word vectors.
+        :param lower_case_backup: Whether to convert all to lowercase when looking up words.
+        :param pad_token: The default padding token.
+        :param unk_token: The default token represents unknown words.
+        """
         super(Vectors, self).__init__()
         self.vec = vocab.Vectors(name, cache, url, unk_init, max_vectors)
         self.unk_init = torch.Tensor.zero_ if unk_init is None else unk_init

@@ -4,8 +4,9 @@ from lambdaLearn.Base.Transformer import Transformer
 class MaxAbsScaler(Transformer):
     def __init__(self, max_abs=None):
         super().__init__()
-        # >> Parameter:
-        # >> - max_abs: The max abs value.
+        """
+        :param max_abs: The max abs value.
+        """
         self.max_abs = max_abs
 
     def transform(self, X):

@@ -6,11 +6,12 @@ from lambdaLearn.utils import class_status, partial
 
 class Top_k_Accurary(ClassifierEvaluation):
     def __init__(self, k=2, normalize=True, sample_weight=None, labels=None):
-        # >> Parameter
-        # >> - k: The k value of Top_k_accurary.
-        # >> - normalize: If False, returns the number of correctly classified samples.
-        # >> - sample_weight: The weight of each sample.
-        # >> - labels: The set of contained labels.
+        """
+        :param k: The k value of Top_k_accurary.
+        :param normalize: If False, returns the number of correctly classified samples.
+        :param sample_weight: The weight of each sample.
+        :param labels: The set of contained labels.
+        """
         super().__init__()
         self.k = k
         self.normalize = normalize

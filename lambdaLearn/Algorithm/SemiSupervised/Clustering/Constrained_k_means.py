@@ -18,10 +18,11 @@ class Constrained_k_means(TransductiveEstimator, ClusterMixin):
         verbose=config.verbose,
         file=config.file,
     ):
-        # >> Parameter
-        # >> - k: The k value for the k-means clustering algorithm.
-        # >> - tolerance: Tolerance of iterative convergence.
-        # >> - max_iterations: The maximum number of iterations.
+        """
+        :param k: The k value for the k-means clustering algorithm.
+        :param tolerance: Tolerance of iterative convergence.
+        :param max_iterations: The maximum number of iterations.
+        """
         self.k = k
         self.tolerance = tolerance
         self.max_iterations = max_iterations

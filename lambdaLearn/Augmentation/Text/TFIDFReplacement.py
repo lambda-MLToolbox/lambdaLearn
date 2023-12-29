@@ -9,11 +9,12 @@ from lambdaLearn.Transform.Text.Tokenizer import Tokenizer
 
 class TFIDFReplacement(Transformer):
     def __init__(self, text, p=0.7, tokenizer=None, cache_len=100000):
-        # >> Parameter:
-        # >> - text: The text that needs to be augmented.
-        # >> - p: Basic replacement probability.
-        # >> - tokenizer: The tokenizer used when the text is not untokenized.
-        # >> - cache_len: buffer size of Random numbers.
+        """
+        :param text: The text that needs to be augmented.
+        :param p: Basic replacement probability.
+        :param tokenizer: The tokenizer used when the text is not untokenized.
+        :param cache_len: buffer size of Random numbers.
+        """
         super(TFIDFReplacement, self).__init__()
         self.text = text
         self.p = p

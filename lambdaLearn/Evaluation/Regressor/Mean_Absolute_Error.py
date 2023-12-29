@@ -6,9 +6,10 @@ from lambdaLearn.utils import partial
 
 class Mean_Absolute_Error(RegressorEvaluation):
     def __init__(self, sample_weight=None, multioutput="uniform_average"):
-        # >> Parameter
-        # >> - sample_weight: The weight of each sample.
-        # >> - multioutput: Aggregation method for multiple outputs.
+        """
+        :param sample_weight: The weight of each sample.
+        :param multioutput: Aggregation method for multiple outputs.
+        """
         super().__init__()
         self.sample_weight = sample_weight
         self.multioutput = multioutput

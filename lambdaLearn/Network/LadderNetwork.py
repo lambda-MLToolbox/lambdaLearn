@@ -299,13 +299,14 @@ class LadderNetwork(torch.nn.Module):
         num_classes=10,
         device="cpu",
     ):
-        # >> Parameter
-        # >> - encoder_sizes: The neural network of generator.
-        # >> - encoder_activations: The activation functions of the encoder.
-        # >> - noise_std: The standard deviation of the noise.
-        # >> - dim_in: The dimension of the input samples。
-        # >> - num_classes: The number of classes.
-        # >> - device: The device to train the model.
+        """
+        :param encoder_sizes: The neural network of generator.
+        :param encoder_activations: The activation functions of the encoder.
+        :param noise_std: The standard deviation of the noise.
+        :param dim_in: The dimension of the input samples。
+        :param num_classes: The number of classes.
+        :param device: The device to train the model.
+        """
         super(LadderNetwork, self).__init__()
         if isinstance(dim_in, numbers.Number):
             input_dim = dim_in

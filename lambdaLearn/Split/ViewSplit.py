@@ -4,11 +4,12 @@ import numpy as np
 
 
 def ViewSplit(X, num_splits=2, axis=1, shuffle=True):
-    # >> Parameter
-    # >> - X: Samples of the data to be split.
-    # >> - num_splits: The number of views
-    # >> - axis: The axis of the dimension to be splited.
-    # >> - shuffle: Whether to shuffle the features.
+    """
+    :param X: Samples of the data to be split.
+    :param num_splits: The number of views
+    :param axis: The axis of the dimension to be splited.
+    :param shuffle: Whether to shuffle the features.
+    """
     shape = X.shape
     range_shape = tuple(i for i in range(len(shape)))
     pre = range_shape[:axis]

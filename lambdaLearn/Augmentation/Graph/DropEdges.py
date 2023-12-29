@@ -6,10 +6,11 @@ from lambdaLearn.Base.Transformer import Transformer
 
 class DropEdges(Transformer):
     def __init__(self, num_drop, shuffle=True, random_state=None):
-        # >> Parameter:
-        # >> - num_drop: The number of edges to be dropped.
-        # >> - shuffle: Whether to shuffle the data.
-        # >> - random_state: The random seed.
+        """
+        :param num_drop: The number of edges to be dropped.
+        :param shuffle: Whether to shuffle the data.
+        :param random_state: The random seed.
+        """
         super().__init__()
         self.num_drop = num_drop
         self.shuffle = shuffle

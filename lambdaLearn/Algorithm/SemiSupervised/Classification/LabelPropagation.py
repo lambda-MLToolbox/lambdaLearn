@@ -20,13 +20,14 @@ class LabelPropagation(TransductiveEstimator, ClassifierMixin):
         verbose=config.verbose,
         file=config.file,
     ):
-        # >> Parameter:
-        # >> - kernel: The kernel function which can be inputted as a string 'rbf' or 'knn' or as a callable function.
-        # >> - gamma: The gamma value when the kernel function is rbf kernel.
-        # >> - n_neighbors: The n value when the kernel function is n_neighbors kernel.
-        # >> - max_iter: The maximum number of iterations.
-        # >> - tol: Convergence tolerance.
-        # >> - n_jobs: The number of parallel jobs.
+        """
+        :param kernel: The kernel function which can be inputted as a string 'rbf' or 'knn' or as a callable function.
+        :param gamma: The gamma value when the kernel function is rbf kernel.
+        :param n_neighbors: The n value when the kernel function is n_neighbors kernel.
+        :param max_iter: The maximum number of iterations.
+        :param tol: Convergence tolerance.
+        :param n_jobs: The number of parallel jobs.
+        """
         self.max_iter = max_iter
         self.tol = tol
         self.kernel = kernel

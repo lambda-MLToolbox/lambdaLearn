@@ -6,9 +6,10 @@ from lambdaLearn.Transform.Text.Tokenizer import Tokenizer
 
 class RandomSwap(Transformer):
     def __init__(self, n=1, tokenizer=None):
-        # >> Parameter:
-        # >> - n: The number of times to swap words.
-        # >> - tokenizer: The tokenizer used when the text is not untokenized.
+        """
+        :param n: The number of times to swap words.
+        :param tokenizer: The tokenizer used when the text is not untokenized.
+        """
         super(RandomSwap, self).__init__()
         self.n = n
         self.tokenizer = tokenizer if tokenizer is not None else Tokenizer("basic_english", "en")
