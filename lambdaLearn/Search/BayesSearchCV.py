@@ -3,6 +3,7 @@ from collections import defaultdict
 from itertools import product
 
 import numpy as np
+import sklearn
 from joblib import Parallel
 from scipy.stats import norm
 from sklearn.base import clone, is_classifier
@@ -11,9 +12,14 @@ from sklearn.metrics import check_scoring
 from sklearn.metrics._scorer import _check_multimetric_scoring
 from sklearn.model_selection._search import BaseSearchCV, ParameterSampler
 from sklearn.model_selection._split import check_cv
-from sklearn.model_selection._validation import _fit_and_score, _insert_error_scores, _warn_about_fit_failures
+from sklearn.model_selection._validation import _fit_and_score, _insert_error_scores
 from sklearn.utils.fixes import delayed
 from sklearn.utils.validation import _check_fit_params, indexable
+
+if sklearn.__version__ in ["1.0", "1.0.1", "1.0.2"]:
+    from sklearn.model_selection._validation import _warn_about_fit_failures as _warn_or_raise_about_fit_failures
+else:
+    from sklearn.model_selection._validation import _warn_or_raise_about_fit_failures
 
 
 def PI(x, gp, y_max=1, xi=0.01, kappa=None):
@@ -98,7 +104,9 @@ class BayesSearchCV(BaseSearchCV):
         self.kappa = kappa
 
     def _run_search(self, evaluate_candidates):
-        """Search n_iter candidates from param_distributions"""
+        """
+        Search n_iter candidates from param_distributions
+        """
         evaluate_candidates(ParameterSampler(self.param_distributions, self.warm_up, random_state=self.random_state))
 
     def fit(self, X, y=None, *, groups=None, **fit_params):
@@ -187,6 +195,8 @@ class BayesSearchCV(BaseSearchCV):
                     "inconsistent results. Expected {} "
                     "splits, got {}".format(n_splits, len(out) // n_candidates)
                 )
+
+            _warn_or_raise_about_fit_failures(out, self.error_score)
 
             # For callable self.scoring, the return type is only know after
             # calling. If the return type is a dictionary, the error scores

@@ -3,16 +3,22 @@ from collections import defaultdict
 from itertools import product
 
 import numpy as np
+import sklearn
 from joblib import Parallel
 from sklearn.base import clone, is_classifier
 from sklearn.metrics import check_scoring
 from sklearn.metrics._scorer import _check_multimetric_scoring
 from sklearn.model_selection._search import BaseSearchCV, ParameterSampler
 from sklearn.model_selection._split import check_cv
-from sklearn.model_selection._validation import _fit_and_score, _insert_error_scores, _warn_about_fit_failures
+from sklearn.model_selection._validation import _fit_and_score, _insert_error_scores
 from sklearn.svm import SVR
 from sklearn.utils.fixes import delayed
 from sklearn.utils.validation import _check_fit_params, indexable
+
+if sklearn.__version__ in ["1.0", "1.0.1", "1.0.2"]:
+    from sklearn.model_selection._validation import _warn_about_fit_failures as _warn_or_raise_about_fit_failures
+else:
+    from sklearn.model_selection._validation import _warn_or_raise_about_fit_failures
 
 
 class MetaLearnerSearchCV(BaseSearchCV):
@@ -150,7 +156,7 @@ class MetaLearnerSearchCV(BaseSearchCV):
                     "splits, got {}".format(n_splits, len(out) // n_candidates)
                 )
 
-            _warn_about_fit_failures(out, self.error_score)
+            _warn_or_raise_about_fit_failures(out, self.error_score)
 
             # For callable self.scoring, the return type is only know after
             # calling. If the return type is a dictionary, the error scores
