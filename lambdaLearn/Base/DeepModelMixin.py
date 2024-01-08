@@ -1,8 +1,17 @@
 import copy
 from math import ceil
+import numpy as np
+from scipy.spatial.distance import cdist
+import logging
+from typing import Literal
+import os
+import sys
+import time
 
 import torch
 from torch.nn import Softmax
+from torch import nn
+from torch.utils.data import DataLoader
 from torch.utils.data.dataset import Dataset
 
 from lambdaLearn.Base.BaseOptimizer import BaseOptimizer
@@ -10,49 +19,50 @@ from lambdaLearn.Base.BaseScheduler import BaseScheduler
 from lambdaLearn.Base.SemiEstimator import SemiEstimator
 from lambdaLearn.Dataloader.TrainDataloader import TrainDataLoader
 from lambdaLearn.Dataset.TrainDataset import TrainDataset
-from lambdaLearn.utils import EMA, to_device
+from lambdaLearn.utils import EMA, to_device, tensor2numpy
+from lambdaLearn.Dataset.CILDataset import CILDataset
 
 
 class DeepModelMixin(SemiEstimator):
     def __init__(
-        self,
-        train_dataset=None,
-        labeled_dataset=None,
-        unlabeled_dataset=None,
-        valid_dataset=None,
-        test_dataset=None,
-        train_dataloader=None,
-        labeled_dataloader=None,
-        unlabeled_dataloader=None,
-        valid_dataloader=None,
-        test_dataloader=None,
-        augmentation=None,
-        network=None,
-        epoch=1,
-        num_it_epoch=None,
-        num_it_total=None,
-        eval_epoch=None,
-        eval_it=None,
-        mu=None,
-        optimizer=None,
-        weight_decay=5e-4,
-        ema_decay=None,
-        scheduler=None,
-        device=None,
-        evaluation=None,
-        train_sampler=None,
-        labeled_sampler=None,
-        unlabeled_sampler=None,
-        train_batch_sampler=None,
-        labeled_batch_sampler=None,
-        unlabeled_batch_sampler=None,
-        valid_sampler=None,
-        valid_batch_sampler=None,
-        test_sampler=None,
-        test_batch_sampler=None,
-        parallel=None,
-        file=None,
-        verbose=True,
+            self,
+            train_dataset=None,
+            labeled_dataset=None,
+            unlabeled_dataset=None,
+            valid_dataset=None,
+            test_dataset=None,
+            train_dataloader=None,
+            labeled_dataloader=None,
+            unlabeled_dataloader=None,
+            valid_dataloader=None,
+            test_dataloader=None,
+            augmentation=None,
+            network=None,
+            epoch=1,
+            num_it_epoch=None,
+            num_it_total=None,
+            eval_epoch=None,
+            eval_it=None,
+            mu=None,
+            optimizer=None,
+            weight_decay=5e-4,
+            ema_decay=None,
+            scheduler=None,
+            device=None,
+            evaluation=None,
+            train_sampler=None,
+            labeled_sampler=None,
+            unlabeled_sampler=None,
+            train_batch_sampler=None,
+            labeled_batch_sampler=None,
+            unlabeled_batch_sampler=None,
+            valid_sampler=None,
+            valid_batch_sampler=None,
+            test_sampler=None,
+            test_batch_sampler=None,
+            parallel=None,
+            file=None,
+            verbose=True,
     ):
         """
         :param train_dataset: Data manager for training data.
@@ -292,14 +302,14 @@ class DeepModelMixin(SemiEstimator):
         pass
 
     def train(
-        self,
-        lb_X=None,
-        lb_y=None,
-        ulb_X=None,
-        lb_idx=None,
-        ulb_idx=None,
-        *args,
-        **kwargs,
+            self,
+            lb_X=None,
+            lb_y=None,
+            ulb_X=None,
+            lb_idx=None,
+            ulb_idx=None,
+            *args,
+            **kwargs,
     ):
         raise NotImplementedError
 
@@ -371,13 +381,13 @@ class DeepModelMixin(SemiEstimator):
         pass
 
     def fit(
-        self,
-        X=None,
-        y=None,
-        unlabeled_X=None,
-        valid_X=None,
-        valid_y=None,
-        unlabeled_y=None,
+            self,
+            X=None,
+            y=None,
+            unlabeled_X=None,
+            valid_X=None,
+            valid_y=None,
+            unlabeled_y=None,
     ):
         self.unlabeled_X = unlabeled_X
         self.unlabeled_y = unlabeled_y
@@ -540,3 +550,537 @@ class DeepModelMixin(SemiEstimator):
                 print(performance)
             self.performance = performance
             return performance
+
+
+class DeepModelMixinCIL:
+    batch_size = 64
+    EPSILON = 1e-8
+
+    def __init__(
+            self,
+            network: None,
+            memory_size: int = 0,
+            memory_per_class: int = 0,
+            fixed_memory: bool = False,
+            device: int = 0,
+            multiple_gpus: list[int] = [0],
+            seed: int = 1989,
+            evaluation_topk: int = 5,
+            evaluation_period: int = 1,
+    ):
+        self._cur_task = -1
+        self._known_classes = 0
+        self._total_classes = 0
+        self._data_memory, self._targets_memory = np.array([]), np.array([])
+
+        self._network = network
+        self._old_network = None
+
+        # evaluation
+        self.topk = evaluation_topk
+        self.eval_period = evaluation_period
+
+        # memory
+        self._memory_size = memory_size
+        self._memory_per_class = memory_per_class
+        self._fixed_memory = fixed_memory
+
+        # device
+        self._device = device
+        self._multiple_gpus = multiple_gpus
+
+        self._set_random(seed)
+
+        self.train_loader = None
+        self.test_loader = None
+
+        logs_name = "logs/CIL_CIFAR100/"
+
+        if not os.path.exists(logs_name):
+            os.makedirs(logs_name)
+
+        # TODO: lack of flexibility
+        logfilename = "logs/CIL_CIFAR100/ResNet_" + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime())
+        logging.info("Log file: {}".format(logfilename))
+        print("Log file: {}".format(logfilename))
+
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s [%(filename)s] => %(message)s",
+            handlers=[
+                logging.FileHandler(filename=logfilename + ".log"),
+                logging.StreamHandler(sys.stdout),
+            ],
+        )
+
+    def fit(self, dataset: CILDataset):
+
+        cnn_curve, nme_curve = {"top1": [], "top5": []}, {"top1": [], "top5": []}
+
+        for task_id in range(dataset.nb_tasks):
+            self.incremental_train(dataset)
+            cnn_accy, nme_accy = self.eval_task(dataset)
+            self.after_task()
+
+            if nme_accy is not None:
+                logging.info("CNN: {}".format(cnn_accy["grouped"]))
+                logging.info("NME: {}".format(nme_accy["grouped"]))
+
+                cnn_curve["top1"].append(cnn_accy["top1"])
+                cnn_curve["top5"].append(cnn_accy["top5"])
+
+                nme_curve["top1"].append(nme_accy["top1"])
+                nme_curve["top5"].append(nme_accy["top5"])
+
+                print("CNN top1 curve: {}".format(cnn_curve["top1"]))
+                print("NME top1 curve: {}".format(nme_curve["top1"]))
+
+                logging.info("CNN top1 curve: {}".format(cnn_curve["top1"]))
+                logging.info("CNN top5 curve: {}".format(cnn_curve["top5"]))
+                logging.info("NME top1 curve: {}".format(nme_curve["top1"]))
+                logging.info("NME top5 curve: {}\n".format(nme_curve["top5"]))
+
+                print('Average Accuracy (CNN):', np.around(sum(cnn_curve["top1"]) / len(cnn_curve["top1"]), decimals=2))
+                print('Average Accuracy (NME):', np.around(sum(nme_curve["top1"]) / len(nme_curve["top1"]), decimals=2))
+
+                logging.info("Average Accuracy (CNN): {}".format(sum(cnn_curve["top1"]) / len(cnn_curve["top1"])))
+                logging.info("Average Accuracy (NME): {}".format(sum(nme_curve["top1"]) / len(nme_curve["top1"])))
+            else:
+                logging.info("No NME accuracy.")
+                logging.info("CNN: {}".format(cnn_accy["grouped"]))
+
+                cnn_curve["top1"].append(cnn_accy["top1"])
+                cnn_curve["top5"].append(cnn_accy["top5"])
+
+                print("CNN top1 curve: {}".format(cnn_curve["top1"]))
+
+                logging.info("CNN top1 curve: {}".format(cnn_curve["top1"]))
+                logging.info("CNN top5 curve: {}\n".format(cnn_curve["top5"]))
+
+                print('Average Accuracy (CNN):', np.around(sum(cnn_curve["top1"]) / len(cnn_curve["top1"]), decimals=2))
+                logging.info("Average Accuracy (CNN): {}".format(sum(cnn_curve["top1"]) / len(cnn_curve["top1"])))
+
+    def incremental_train(self, dataset: CILDataset):
+        raise NotImplementedError
+
+    def eval_task(self, dataset: CILDataset) -> (dict, dict):
+        y_pred, y_true = self._eval_cnn(self.test_loader)
+        cnn_accy = self._evaluate(y_pred, y_true)
+
+        if hasattr(self, "_class_means"):
+            y_pred, y_true = self._eval_nme(self.test_loader, self._class_means)
+            nme_accy = self._evaluate(y_pred, y_true)
+        else:
+            nme_accy = None
+
+        return cnn_accy, nme_accy
+
+    def _eval_cnn(self, loader):
+        self._network.eval()
+        y_pred, y_true = [], []
+        for _, (_, inputs, targets) in enumerate(loader):
+            inputs = inputs.to(self._device)
+            with torch.no_grad():
+                outputs = self._network(inputs)["logits"]
+            predicts = torch.topk(
+                outputs, k=self.topk, dim=1, largest=True, sorted=True
+            )[
+                1
+            ]  # [bs, topk]
+            y_pred.append(predicts.cpu().numpy())
+            y_true.append(targets.cpu().numpy())
+
+        return np.concatenate(y_pred), np.concatenate(y_true)  # [N, topk]
+
+    def _eval_nme(self, loader, class_means):
+        self._network.eval()
+        vectors, y_true = self._extract_vectors(loader)
+        vectors = (vectors.T / (np.linalg.norm(vectors.T, axis=0) + self.EPSILON)).T
+
+        dists = cdist(class_means, vectors, "sqeuclidean")  # [nb_classes, N]
+        scores = dists.T  # [N, nb_classes], choose the one with the smallest distance
+
+        return np.argsort(scores, axis=1)[:, : self.topk], y_true  # [N, topk]
+
+    def after_task(self):
+        self._known_classes = self._total_classes
+
+    @torch.no_grad()
+    def predict(self, X: np.ndarray, cls_mode: Literal['fc', 'nme'] = 'fc', topk=1) -> np.ndarray:
+        """
+        :param cls_mode: str, either 'fc' or 'nme'; type of classifiers
+        """
+        self._network.eval()
+        X = X.reshape(-1, 3, 32, 32)
+        X = torch.from_numpy(X).to(self._device).float()
+
+        if cls_mode.lower() == 'fc':
+            outputs = self._network(X)["logits"]
+            preds = torch.topk(outputs, k=topk, dim=1, largest=True, sorted=True)[1]
+            preds = np.array(preds.cpu())
+        else:
+            if isinstance(self._network, nn.DataParallel):
+                vectors = tensor2numpy(
+                    self._network.module.extract_vector(X)
+                )
+            else:
+                vectors = tensor2numpy(
+                    self._network.extract_vector(X)
+                )
+            vectors = (vectors.T / (np.linalg.norm(vectors.T, axis=0) + self.EPSILON)).T
+
+            dists = cdist(self._class_means, vectors, "sqeuclidean")
+            preds = np.argsort(dists.T, axis=1)[:, : topk]
+
+        return preds
+
+    @torch.no_grad()
+    def evaluate(self, y_pred, y_true):
+        return self._evaluate(y_pred, y_true)
+
+    def _extract_vectors(self, loader):
+        self._network.eval()
+        vectors, targets = [], []
+        for _, _inputs, _targets in loader:
+            _targets = _targets.numpy()
+            if isinstance(self._network, nn.DataParallel):
+                _vectors = tensor2numpy(
+                    self._network.module.extract_vector(_inputs.to(self._device))
+                )
+            else:
+                _vectors = tensor2numpy(
+                    self._network.extract_vector(_inputs.to(self._device))
+                )
+
+            vectors.append(_vectors)
+            targets.append(_targets)
+
+        return np.concatenate(vectors), np.concatenate(targets)
+
+    def _compute_accuracy(self, model, loader):
+        model.eval()
+        correct, total = 0, 0
+        for i, (_, inputs, targets) in enumerate(loader):
+            inputs = inputs.to(self._device)
+            with torch.no_grad():
+                outputs = model(inputs)["logits"]
+            predicts = torch.max(outputs, dim=1)[1]
+            correct += (predicts.cpu() == targets).sum()
+            total += len(targets)
+
+        return np.around(tensor2numpy(correct) * 100 / total, decimals=2)
+
+    def _evaluate(self, y_pred, y_true):
+        ret = {}
+        grouped = self.accuracy(y_pred.T[0], y_true, self._known_classes, self.eval_period)
+        ret["grouped"] = grouped
+        ret["top1"] = grouped["total"]
+        ret["top{}".format(self.topk)] = np.around(
+            (y_pred.T == np.tile(y_true, (self.topk, 1))).sum() * 100 / len(y_true),
+            decimals=2,
+        )
+
+        return ret
+
+    @staticmethod
+    def accuracy(y_pred: np.ndarray, y_true: np.array, nb_old, increment=1):
+        assert len(y_pred) == len(y_true), "Data length error."
+        all_acc = {}
+        all_acc["total"] = np.around(
+            (y_pred == y_true).sum() * 100 / len(y_true), decimals=2
+        )
+
+        # Grouped accuracy
+        for class_id in range(0, np.max(y_true), increment):
+            idxes = np.where(
+                np.logical_and(y_true >= class_id, y_true < class_id + increment)
+            )[0]
+            label = "{}-{}".format(
+                str(class_id).rjust(2, "0"), str(class_id + increment - 1).rjust(2, "0")
+            )
+            all_acc[label] = np.around(
+                (y_pred[idxes] == y_true[idxes]).sum() * 100 / len(idxes), decimals=2
+            )
+
+        # Old accuracy
+        idxes = np.where(y_true < nb_old)[0]
+        all_acc["old"] = (
+            0
+            if len(idxes) == 0
+            else np.around(
+                (y_pred[idxes] == y_true[idxes]).sum() * 100 / len(idxes), decimals=2
+            )
+        )
+
+        # New accuracy
+        idxes = np.where(y_true >= nb_old)[0]
+        all_acc["new"] = np.around(
+            (y_pred[idxes] == y_true[idxes]).sum() * 100 / len(idxes), decimals=2
+        )
+
+        return all_acc
+
+    def _get_memory(self):
+        if len(self._data_memory) == 0:
+            return None
+        else:
+            return (self._data_memory, self._targets_memory)
+
+    def build_rehearsal_memory(self, data_manager, per_class):
+        if self._fixed_memory:
+            self._construct_exemplar_unified(data_manager, per_class)
+        else:
+            self._reduce_exemplar(data_manager, per_class)
+            self._construct_exemplar(data_manager, per_class)
+
+    def _construct_exemplar_unified(self, data_manager, m):
+        logging.info(
+            "Constructing exemplars for new classes...({} per classes)".format(m)
+        )
+        _class_means = np.zeros((self._total_classes, self.feature_dim))
+
+        # Calculate the means of old classes with newly trained network
+        for class_idx in range(self._known_classes):
+            mask = np.where(self._targets_memory == class_idx)[0]
+            class_data, class_targets = (
+                self._data_memory[mask],
+                self._targets_memory[mask],
+            )
+
+            class_dset = data_manager.get_dataset(
+                [], source="train", mode="test", appendent=(class_data, class_targets)
+            )
+            class_loader = DataLoader(
+                class_dset, batch_size=self.batch_size, shuffle=False, num_workers=4
+            )
+            vectors, _ = self._extract_vectors(class_loader)
+            vectors = (vectors.T / (np.linalg.norm(vectors.T, axis=0) + self.EPSILON)).T
+            mean = np.mean(vectors, axis=0)
+            mean = mean / np.linalg.norm(mean)
+
+            _class_means[class_idx, :] = mean
+
+        # Construct exemplars for new classes and calculate the means
+        for class_idx in range(self._known_classes, self._total_classes):
+            data, targets, class_dset = data_manager.get_dataset(
+                np.arange(class_idx, class_idx + 1),
+                source="train",
+                mode="test",
+                ret_data=True,
+            )
+            class_loader = DataLoader(
+                class_dset, batch_size=self.batch_size, shuffle=False, num_workers=4
+            )
+
+            vectors, _ = self._extract_vectors(class_loader)
+            vectors = (vectors.T / (np.linalg.norm(vectors.T, axis=0) + self.EPSILON)).T
+            class_mean = np.mean(vectors, axis=0)
+
+            # Select
+            selected_exemplars = []
+            exemplar_vectors = []
+            for k in range(1, m + 1):
+                S = np.sum(
+                    exemplar_vectors, axis=0
+                )  # [feature_dim] sum of selected exemplars vectors
+                mu_p = (vectors + S) / k  # [n, feature_dim] sum to all vectors
+                i = np.argmin(np.sqrt(np.sum((class_mean - mu_p) ** 2, axis=1)))
+
+                selected_exemplars.append(
+                    np.array(data[i])
+                )  # New object to avoid passing by inference
+                exemplar_vectors.append(
+                    np.array(vectors[i])
+                )  # New object to avoid passing by inference
+
+                vectors = np.delete(
+                    vectors, i, axis=0
+                )  # Remove it to avoid duplicative selection
+                data = np.delete(
+                    data, i, axis=0
+                )  # Remove it to avoid duplicative selection
+
+            selected_exemplars = np.array(selected_exemplars)
+            exemplar_targets = np.full(m, class_idx)
+            self._data_memory = (
+                np.concatenate((self._data_memory, selected_exemplars))
+                if len(self._data_memory) != 0
+                else selected_exemplars
+            )
+            self._targets_memory = (
+                np.concatenate((self._targets_memory, exemplar_targets))
+                if len(self._targets_memory) != 0
+                else exemplar_targets
+            )
+
+            # Exemplar mean
+            exemplar_dset = data_manager.get_dataset(
+                [],
+                source="train",
+                mode="test",
+                appendent=(selected_exemplars, exemplar_targets),
+            )
+            exemplar_loader = DataLoader(
+                exemplar_dset, batch_size=self.batch_size, shuffle=False, num_workers=4
+            )
+            vectors, _ = self._extract_vectors(exemplar_loader)
+            vectors = (vectors.T / (np.linalg.norm(vectors.T, axis=0) + self.EPSILON)).T
+            mean = np.mean(vectors, axis=0)
+            mean = mean / np.linalg.norm(mean)
+
+            _class_means[class_idx, :] = mean
+
+        self._class_means = _class_means
+
+    def _reduce_exemplar(self, data_manager, m):
+        logging.info("Reducing exemplars...({} per classes)".format(m))
+        dummy_data, dummy_targets = copy.deepcopy(self._data_memory), copy.deepcopy(
+            self._targets_memory
+        )
+        self._class_means = np.zeros((self._total_classes, self.feature_dim))
+        self._data_memory, self._targets_memory = np.array([]), np.array([])
+
+        for class_idx in range(self._known_classes):
+            mask = np.where(dummy_targets == class_idx)[0]
+            dd, dt = dummy_data[mask][:m], dummy_targets[mask][:m]
+            self._data_memory = (
+                np.concatenate((self._data_memory, dd))
+                if len(self._data_memory) != 0
+                else dd
+            )
+            self._targets_memory = (
+                np.concatenate((self._targets_memory, dt))
+                if len(self._targets_memory) != 0
+                else dt
+            )
+
+            # Exemplar mean
+            idx_dataset = data_manager.get_dataset(
+                [], source="train", mode="test", appendent=(dd, dt)
+            )
+            idx_loader = DataLoader(
+                idx_dataset, batch_size=self.batch_size, shuffle=False, num_workers=4
+            )
+            vectors, _ = self._extract_vectors(idx_loader)
+            vectors = (vectors.T / (np.linalg.norm(vectors.T, axis=0) + self.EPSILON)).T
+            mean = np.mean(vectors, axis=0)
+            mean = mean / np.linalg.norm(mean)
+
+            self._class_means[class_idx, :] = mean
+
+    def _construct_exemplar(self, data_manager, m):
+        logging.info("Constructing exemplars...({} per classes)".format(m))
+        for class_idx in range(self._known_classes, self._total_classes):
+            data, targets, idx_dataset = data_manager.get_dataset(
+                np.arange(class_idx, class_idx + 1),
+                source="train",
+                mode="test",
+                ret_data=True,
+            )
+            idx_loader = DataLoader(
+                idx_dataset, batch_size=self.batch_size, shuffle=False, num_workers=4
+            )
+            vectors, _ = self._extract_vectors(idx_loader)
+            vectors = (vectors.T / (np.linalg.norm(vectors.T, axis=0) + self.EPSILON)).T
+            class_mean = np.mean(vectors, axis=0)
+
+            # Select
+            selected_exemplars = []
+            exemplar_vectors = []  # [n, feature_dim]
+            for k in range(1, m + 1):
+                S = np.sum(
+                    exemplar_vectors, axis=0
+                )  # [feature_dim] sum of selected exemplars vectors
+                mu_p = (vectors + S) / k  # [n, feature_dim] sum to all vectors
+                i = np.argmin(np.sqrt(np.sum((class_mean - mu_p) ** 2, axis=1)))
+                selected_exemplars.append(
+                    np.array(data[i])
+                )  # New object to avoid passing by inference
+                exemplar_vectors.append(
+                    np.array(vectors[i])
+                )  # New object to avoid passing by inference
+
+                vectors = np.delete(
+                    vectors, i, axis=0
+                )  # Remove it to avoid duplicative selection
+                data = np.delete(
+                    data, i, axis=0
+                )  # Remove it to avoid duplicative selection
+
+            # uniques = np.unique(selected_exemplars, axis=0)
+            # print('Unique elements: {}'.format(len(uniques)))
+            selected_exemplars = np.array(selected_exemplars)
+            exemplar_targets = np.full(m, class_idx)
+            self._data_memory = (
+                np.concatenate((self._data_memory, selected_exemplars))
+                if len(self._data_memory) != 0
+                else selected_exemplars
+            )
+            self._targets_memory = (
+                np.concatenate((self._targets_memory, exemplar_targets))
+                if len(self._targets_memory) != 0
+                else exemplar_targets
+            )
+
+            # Exemplar mean
+            idx_dataset = data_manager.get_dataset(
+                [],
+                source="train",
+                mode="test",
+                appendent=(selected_exemplars, exemplar_targets),
+            )
+            idx_loader = DataLoader(
+                idx_dataset, batch_size=self.batch_size, shuffle=False, num_workers=4
+            )
+            vectors, _ = self._extract_vectors(idx_loader)
+            vectors = (vectors.T / (np.linalg.norm(vectors.T, axis=0) + self.EPSILON)).T
+            mean = np.mean(vectors, axis=0)
+            mean = mean / np.linalg.norm(mean)
+
+            self._class_means[class_idx, :] = mean
+
+    @property
+    def feature_dim(self):
+        if isinstance(self._network, nn.DataParallel):
+            return self._network.module.feature_dim
+        else:
+            return self._network.feature_dim
+
+    @property
+    def exemplar_size(self):
+        assert len(self._data_memory) == len(
+            self._targets_memory
+        ), "Exemplar size error."
+        return len(self._targets_memory)
+
+    @property
+    def samples_per_class(self):
+        if self._fixed_memory:
+            return self._memory_per_class
+        else:
+            assert self._total_classes != 0, "Total classes is 0"
+            return self._memory_size // self._total_classes
+
+    def _set_device(self):
+        device_type = self._multiple_gpus
+        gpus = []
+
+        for device in device_type:
+            if device_type == -1:
+                device = torch.device("cpu")
+            else:
+                device = torch.device("cuda:{}".format(device))
+
+            gpus.append(device)
+
+        self._multiple_gpus = gpus
+
+    def _set_random(self, seed):
+        print("Setting random seed to {}".format(seed))
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+
+        np.random.seed(seed)

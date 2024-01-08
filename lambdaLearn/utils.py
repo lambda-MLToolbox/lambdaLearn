@@ -235,6 +235,60 @@ def to_numpy(X):
     return X.numpy()
 
 
+def tensor2numpy(x):
+    return x.cpu().data.numpy() if x.is_cuda else x.data.numpy()
+
+
+def count_parameters(model, trainable=False):
+    if trainable:
+        return sum(p.numel() for p in model.parameters() if p.requires_grad)
+    return sum(p.numel() for p in model.parameters())
+
+
+def get_CIL_method(method_name):
+    if method_name == "fine_tune":
+        from lambdaLearn.Algorithm.ClassIncrementalLearning.FineTune import FineTune
+        return FineTune()
+    elif method_name == "icarl":
+        from lambdaLearn.Algorithm.ClassIncrementalLearning.iCaRL import iCaRL
+        return iCaRL()
+    elif method_name == "ewc":
+        from lambdaLearn.Algorithm.ClassIncrementalLearning.EWC import EWC
+        return EWC()
+    elif method_name == "lwf":
+        from lambdaLearn.Algorithm.ClassIncrementalLearning.LwF import LwF
+        return LwF()
+    elif method_name == "replay":
+        from lambdaLearn.Algorithm.ClassIncrementalLearning.Replay import Replay
+        return Replay()
+    elif method_name == "der":
+        from lambdaLearn.Algorithm.ClassIncrementalLearning.DER import DER
+        return DER()
+    elif method_name == "wa":
+        from lambdaLearn.Algorithm.ClassIncrementalLearning.WA import WA
+        return WA()
+    elif method_name == "simplecil":
+        from lambdaLearn.Algorithm.ClassIncrementalLearning.SimpleCIL import SimpleCIL
+        return SimpleCIL()
+    elif method_name == "foster":
+        from lambdaLearn.Algorithm.ClassIncrementalLearning.Foster import Foster
+        return Foster()
+    elif method_name == "memo":
+        from lambdaLearn.Algorithm.ClassIncrementalLearning.MEMO import MEMO
+        return MEMO()
+    elif method_name == "beef":
+        from lambdaLearn.Algorithm.ClassIncrementalLearning.BEEF import BEEFISO
+        return BEEFISO()
+    else:
+        raise NotImplementedError
+
+
+def KD_loss(pred, soft, T):
+    pred = torch.log_softmax(pred / T, dim=1)
+    soft = torch.softmax(soft / T, dim=1)
+    return -1 * torch.mul(soft, pred).sum() / pred.shape[0]
+
+
 # def to_image(X):
 #     if isinstance(X,Image.Image):
 #         return X
