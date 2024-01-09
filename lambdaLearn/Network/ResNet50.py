@@ -131,7 +131,7 @@ class Bottleneck(nn.Module):
         return out
 
 
-class ResNet50(nn.Module):
+class ResNet(nn.Module):
     def __init__(
         self,
         block: Type[Union[BasicBlock, Bottleneck]] = Bottleneck,
@@ -153,7 +153,7 @@ class ResNet50(nn.Module):
         :param replace_stride_with_dilation: A list or tuple of 3 bool variables. It represents whether to perform convolution expansion for 64, 128, and 256-dimensional modules.
         :param norm_layer: Regularization method. The default is BatchNorm2d.
         """
-        super(ResNet50, self).__init__()
+        super(ResNet, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
@@ -182,6 +182,9 @@ class ResNet50(nn.Module):
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2])
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.num_classes = num_classes
+
+        self.out_dim = 512 * block.expansion
+
         if isinstance(self.num_classes, (list, tuple)):
             self.fc = []
             for num in self.num_classes:
@@ -277,3 +280,56 @@ class ResNet50(nn.Module):
 
     def forward(self, x):
         return self._forward_impl(x)
+
+
+class ResNet50(ResNet):
+    def __init__(self, num_classes: int = 1000, zero_init_residual: bool = False, **kwargs):
+        super(ResNet50, self).__init__(
+            Bottleneck, [3, 4, 6, 3], num_classes=num_classes, zero_init_residual=zero_init_residual, **kwargs)
+
+
+
+class ResNetBackbone(ResNet):
+    def __init__(
+        self,
+        block: Type[Union[BasicBlock, Bottleneck]] = Bottleneck,
+        layers: List[int] = [3, 4, 6, 3],
+        num_classes: int = 1000,
+        zero_init_residual: bool = False,
+        groups: int = 1,
+        width_per_group: int = 64,
+        replace_stride_with_dilation: Optional[List[bool]] = None,
+        norm_layer: Optional[Callable[..., nn.Module]] = None,
+    ):
+        super().__init__(block, layers, num_classes, zero_init_residual, groups, width_per_group, replace_stride_with_dilation, norm_layer)
+        self.fc = None
+        self.conv1.kernel_size = 3
+        self.conv1.stride = 1
+        self.conv1.padding = 1
+
+    def _forward_impl(self, x):
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+
+        x_1 = self.layer1(x)
+        x_2 = self.layer2(x_1)
+        x_3 = self.layer3(x_2)
+        x_4 = self.layer4(x_3)
+
+        x = self.avgpool(x_4)
+        features = torch.flatten(x, 1)
+
+        return {
+            'fmaps': [x_1, x_2, x_3, x_4],
+            'features': features
+        }
+
+
+
+class ResNet50Backbone(ResNetBackbone):
+    def __init__(self, num_classes: int = 100, zero_init_residual: bool = False, **kwargs):
+        super(ResNet50Backbone, self).__init__(
+            Bottleneck, [3, 4, 6, 3], num_classes=num_classes, zero_init_residual=zero_init_residual, **kwargs
+        )
+
