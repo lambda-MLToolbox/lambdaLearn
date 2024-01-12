@@ -1,4 +1,4 @@
-This folder contains an implementation for [**Abductive Learning (ABL)**](https://www.lamda.nju.edu.cn/publication/chap_ABL.pdf), which is built from [ABLkit](https://github.com/AbductiveLearning/ABLkit/tree/Dev), an efficient Python toolkit.
+This folder contains an implementation for [**Abductive Learning (ABL)**](https://www.lamda.nju.edu.cn/publication/chap_ABL.pdf), which is built from [**ABLkit**](https://github.com/AbductiveLearning/ABLkit/tree/Dev), an efficient Python toolkit.
 
 ## What is ABL and ABLkit?
 
@@ -28,8 +28,8 @@ ABLkit requires user data to be either structured as **tuple** `(X, gt_pseudo_la
 
 `X` is a list of input examples containing instances, `gt_pseudo_label` is the ground-truth label of each example in `X` and `Y` is the ground-truth reasoning result of each example in `X`. Note that `gt_pseudo_label` is only used to evaluate the machine learning model's performance but not to train it. 
 
-For tabular data, one may method `lambdaLearn.Algorithm.AbductiveLearning.data.DataConverter` 
-to convert them to aforementioned ABLkit data. Below shows an example:
+For tabular data, one may use `lambdaLearn.Algorithm.AbductiveLearning.data.DataConverter` 
+to convert them to the aforementioned ABLkit data. Below shows an example:
 
 ```
 from lambdaLearn.Dataset.Tabular.BreastCancer import BreastCancer
