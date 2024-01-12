@@ -1,4 +1,4 @@
-This folder contains an implementation for [**Abductive Learning (ABL)**](https://www.lamda.nju.edu.cn/publication/chap_ABL.pdf), which is built from [**ABLkit**](https://github.com/AbductiveLearning/ABLkit/tree/Dev), an efficient Python toolkit.
+This folder contains an implementation for [**Abductive Learning (ABL)**](https://www.lamda.nju.edu.cn/publication/chap_ABL.pdf), which is built from [**ABLkit**](https://github.com/AbductiveLearning/ABLkit/tree/Dev), an efficient Python toolkit for ABL.
 
 ## What is ABL and ABLkit?
 
@@ -31,7 +31,7 @@ ABLkit requires user data to be either structured as **tuple** `(X, gt_pseudo_la
 For tabular data, one may use `lambdaLearn.Algorithm.AbductiveLearning.data.DataConverter` 
 to convert them to the aforementioned ABLkit data. Below shows an example:
 
-```
+```python
 from lambdaLearn.Dataset.Tabular.BreastCancer import BreastCancer
 from lambdaLearn.Algorithm.AbductiveLearning.data import DataConverter
 
@@ -87,7 +87,7 @@ base_model = converter.convert_lambdalearn_to_basicnn(
 )
 ``` 
 
-After completing the two conversions mentioned above, the construction of other components in a ABL system is the same as that of ABLkit. To explore detailed information of ABL and ABLkit, please refer to - [document](https://ablkit.readthedocs.io/en/latest/index.html).
+After completing the two conversions mentioned above, the construction of other components in a ABL system is the same as that of ABLkit. To explore detailed information of ABL and ABLkit, please refer to - [ABLkit's document](https://ablkit.readthedocs.io/en/latest/index.html).
 
 ## References
 
