@@ -1,7 +1,7 @@
 from typing import Any, Tuple
 
-from lambdaLearn.Algorithm.ablkit.utils import tab_data_to_tuple
-from lambdaLearn.Algorithm.ablkit.data.structures.list_data import ListData
+from lambdaLearn.Algorithm.ABLkit.utils import tab_data_to_tuple
+from lambdaLearn.Algorithm.ABLkit.data.structures.list_data import ListData
 from lambdaLearn.Base.TabularMixin import TabularMixin
 
 

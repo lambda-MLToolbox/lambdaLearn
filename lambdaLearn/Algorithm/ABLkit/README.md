@@ -28,35 +28,35 @@ ABLkit requires user data to be either structured as **tuple** `(X, gt_pseudo_la
 
 `X` is a list of input examples containing instances, `gt_pseudo_label` is the ground-truth label of each example in `X` and `Y` is the ground-truth reasoning result of each example in `X`. Note that `gt_pseudo_label` is only used to evaluate the machine learning model's performance but not to train it. 
 
-For tabular data, one may use `lambdaLearn.Algorithm.ablkit.data.DataConverter` 
+For tabular data, one may use `lambdaLearn.Algorithm.ABLkit.data.DataConverter` 
 to convert them to the aforementioned ABLkit data. Below shows an example:
 
 ```python
 from lambdaLearn.Dataset.Tabular.BreastCancer import BreastCancer
-from lambdaLearn.Algorithm.ablkit.data import DataConverter
+from lambdaLearn.Algorithm.ABLkit.data import DataConverter
 
 # Get a lambdaLearn tabular dataset: BreastCancer
 breast_dataset = BreastCancer(labeled_size=0.1, stratified=True, shuffle=True)
 
 # Instantiate an DataConverter
-dataconverter = DataConverter()
+data_converter = DataConverter()
 
 # Convert BreastCancer
-ablkitdata = dataconverter.convert_lambdalearn_to_tuple(breast_dataset)
+ABLkit_dataset = data_converter.convert_lambdalearn_to_tuple(breast_dataset)
 ```
 
 For other types of data, please manually convert them.
 
 ### Convert Model to ABLkit Form
 
-ABLkit requires user to provide a base model for machine learning, and then wrap it into an instance of `ABLModel`. To convert LambdaLearn model to the aforementioned ABLkit learning models, one may use `lambdaLearn.Algorithm.ablkit.learning.ModelConverter`. Below shows an example:
+ABLkit requires user to provide a base model for machine learning, and then wrap it into an instance of `ABLModel`. To convert LambdaLearn model to the aforementioned ABLkit learning models, one may use `lambdaLearn.Algorithm.ABLkit.learning.ModelConverter`. Below shows an example:
 
 ```python
 from torch import nn
 from torch.optim import RMSprop, lr_scheduler
 from lambdaLearn.Algorithm.SemiSupervised.Classification.FixMatch import FixMatch
 from lambdaLearn.Network.LeNet5 import LeNet5
-from lambdaLearn.Algorithm.ablkit.learning import ModelConverter
+from lambdaLearn.Algorithm.ABLkit.learning import ModelConverter
 
 # Get a lambdaLearn model: FixMatch
 model = FixMatch(

@@ -1,5 +1,5 @@
 """
-Implementation of utilities used in ablkit.
+Implementation of utilities used in ABLkit.
 
 Copyright (c) 2024 LAMDA.  All rights reserved.
 """
