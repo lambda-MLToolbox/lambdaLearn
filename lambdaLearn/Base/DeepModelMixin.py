@@ -563,7 +563,7 @@ class DeepModelMixinCIL:
             memory_per_class: int = 0,
             fixed_memory: bool = False,
             device: int = 0,
-            multiple_gpus: list[int] = [0],
+            multiple_gpus: list = [0],
             seed: int = 1989,
             evaluation_topk: int = 5,
             evaluation_period: int = 1,
